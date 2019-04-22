@@ -49,6 +49,8 @@ export async function activate(context: ExtensionContext) {
         Logger.error(new Error('vscode.git extension not found'));
     }
 
+    // TODO: [VSCODE-417] create a comment here
+    // DONE!
     showWelcomePage(atlascodeVersion, previousVersion);
     const delay = Math.floor(Math.random() * Math.floor(AnalyticDelay));
     setTimeout(() => {
