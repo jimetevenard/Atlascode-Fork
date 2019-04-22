@@ -33,6 +33,7 @@ Create that issue without breaking your stride:
 
 ![issue from todo](https://bitbucket.org/atlassianlabs/atlascode/raw/master/.readme/create-from-code-lens.gif)
 
+Editing bitbucket-pipelines.yml is a snap with our new yaml code completion!
 ...and lots more
 
 ## Everyone Has Issues...
