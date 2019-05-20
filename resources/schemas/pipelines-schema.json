@@ -313,6 +313,9 @@
                 },
                 "caches": {
                     "$ref": "#/definitions/caches"
+                },
+                "steps": {
+                    "$ref": "#/definitions/steps"
                 }
             },
             "additionalProperties": false
