@@ -4,6 +4,7 @@ import { Commands } from '../../commands';
 import { FileDiffQueryParams } from './pullRequestNode';
 import { PullRequestApi } from '../../bitbucket/pullRequests';
 import TurndownService from 'turndown';
+import { Comment } from '../../bitbucket/model';
 
 const turndownService = new TurndownService();
 
@@ -51,7 +52,7 @@ export class PullRequestCommentController implements vscode.Disposable {
         const { commentThreads } = JSON.parse(uri.query) as FileDiffQueryParams;
 
         (commentThreads || [])
-            .forEach((c: Bitbucket.Schema.Comment[]) => {
+            .forEach((c: Comment[]) => {
                 let range = new vscode.Range(0, 0, 0, 0);
                 if (c[0].inline!.from) {
                     range = new vscode.Range(c[0].inline!.from! - 1, 0, c[0].inline!.from! - 1, 0);
@@ -114,15 +115,15 @@ export class PullRequestCommentController implements vscode.Disposable {
         this.createOrUpdateThread(commentThread.id, uri, commentThread.range, commentThread.comments);
     }
 
-    private static createVSCodeComment(data: Bitbucket.Schema.Comment) {
+    private static createVSCodeComment(data: Comment) {
         return {
-            body: new vscode.MarkdownString(turndownService.turndown(data.content!.html!)),
-            userName: data.user ? data.user.display_name! : 'Unknown user',
+            body: new vscode.MarkdownString(turndownService.turndown(data.htmlContent)),
+            userName: data.user.displayName,
             author: {
-                name: data.user ? data.user.display_name! : 'Unknown user'
+                name: data.user.displayName
             },
-            commentId: String(data.id!),
-            id: String(data.id!)
+            commentId: String(data.id),
+            id: String(data.id)
         };
     }
 
