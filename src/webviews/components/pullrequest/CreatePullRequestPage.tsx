@@ -26,6 +26,7 @@ import { TransitionMenu } from '../issue/TransitionMenu';
 import { Issue, Transition, isIssue } from '../../../jira/jiraModel';
 import { StatusMenu } from '../bbissue/StatusMenu';
 import NavItem from '../issue/NavItem';
+import { Reviewer } from '../../../bitbucket/model';
 
 const createdFromAtlascodeFooter = '\n\n---\n_Created from_ [_Atlassian for VS Code_](https://marketplace.visualstudio.com/items?itemName=Atlassian.atlascode)';
 
@@ -40,7 +41,7 @@ interface MyState {
     summaryManuallyEdited: boolean;
     repo?: { label: string; value: RepoData; };
     remote?: { label: string; value: Remote; };
-    reviewers: Bitbucket.Schema.User[];
+    reviewers: Reviewer[];
     sourceBranch?: { label: string; value: Branch };
     sourceRemoteBranchName?: string;
     destinationBranch?: { label: string; value: Ref };
