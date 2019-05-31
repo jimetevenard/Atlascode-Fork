@@ -15,6 +15,7 @@ import { Issue, isIssue } from './jira/jiraIssue';
 import { showIssue } from './commands/jira/showIssue';
 import { createIssue } from './commands/jira/createIssue';
 import { PullRequestCommentController } from './views/pullrequest/prCommentController';
+import { BitbucketIssue } from './bitbucket/model';
 
 export enum Commands {
     BitbucketSelectContainer = 'atlascode.bb.selectContainer',
@@ -81,7 +82,7 @@ export function registerCommands(vscodeContext: vscode.ExtensionContext) {
         vscode.commands.registerCommand(Commands.TransitionIssue, (issue) => transitionIssue(issue)),
         vscode.commands.registerCommand(Commands.AssignIssueToMe, (issuNode: IssueNode) => assignIssue(issuNode)),
         vscode.commands.registerCommand(Commands.StartWorkOnIssue, (issueNodeOrIssue: IssueNode | Issue) => Container.startWorkOnIssueWebview.createOrShowIssue(isIssue(issueNodeOrIssue) ? issueNodeOrIssue : issueNodeOrIssue.issue)),
-        vscode.commands.registerCommand(Commands.StartWorkOnBitbucketIssue, (issue: Bitbucket.Schema.Issue) => Container.startWorkOnBitbucketIssueWebview.createOrShowIssue(issue)),
+        vscode.commands.registerCommand(Commands.StartWorkOnBitbucketIssue, (issue: BitbucketIssue) => Container.startWorkOnBitbucketIssueWebview.createOrShowIssue(issue)),
         vscode.commands.registerCommand(Commands.StartPipeline, (node: BranchNode) => startPipeline(node)),
         vscode.commands.registerCommand(Commands.ViewDiff, async (...diffArgs: [() => {}, vscode.Uri, vscode.Uri, string]) => {
             viewScreenEvent(Registry.screen.pullRequestDiffScreen).then(e => { Container.analyticsClient.sendScreenEvent(e); });
@@ -91,6 +92,6 @@ export function registerCommands(vscodeContext: vscode.ExtensionContext) {
         vscode.commands.registerCommand(Commands.ShowPipeline, (pipelineInfo: any) => {
             Container.pipelineViewManager.createOrShow(pipelineInfo);
         }),
-        vscode.commands.registerCommand(Commands.ShowBitbucketIssue, (issue: Bitbucket.Schema.Issue) => Container.bitbucketIssueViewManager.createOrShow(issue))
+        vscode.commands.registerCommand(Commands.ShowBitbucketIssue, (issue: BitbucketIssue) => Container.bitbucketIssueViewManager.createOrShow(issue))
     );
 }
