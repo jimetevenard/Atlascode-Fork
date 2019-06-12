@@ -794,6 +794,7 @@
         "@atlaskit/tag-group": "^6.0.8",
         "@atlaskit/tooltip": "^12.1.9",
         "@atlaskit/util-shared-styles": "^3.0.0",
+        "@atlassian/bitbucket-server": "^0.0.2",
         "@atlassian/jira": "^0.1.0",
         "@deviniti/jql-autocomplete": "^1.0.2",
         "ajv": "^6.5.4",
