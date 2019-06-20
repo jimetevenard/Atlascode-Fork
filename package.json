@@ -43,6 +43,7 @@
         "redhat.vscode-yaml"
     ],
     "main": "./build/extension/extension",
+    "extensionKind": "workspace",
     "contributes": {
         "commands": [
             {
