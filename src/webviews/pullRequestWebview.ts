@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import { AbstractReactWebview, InitializingWebview } from './abstractWebview';
 import { PullRequest, PaginatedComments, PaginatedCommits, BitbucketIssueData, BitbucketIssue } from '../bitbucket/model';
-import { PRData, } from '../ipc/prMessaging';
+import { PRData } from '../ipc/prMessaging';
 import { Action, onlineStatus } from '../ipc/messaging';
 import { Logger } from '../logger';
 import { Repository, Remote } from "../typings/git";
-import { isPostComment, isCheckout, isMerge, Merge, isUpdateApproval } from '../ipc/prActions';
+import { isPostComment, isCheckout, isMerge, Merge, isUpdateApproval, isFetchUsers } from '../ipc/prActions';
 import { isOpenJiraIssue } from '../ipc/issueActions';
 import { Commands } from '../commands';
 import { extractIssueKeys, extractBitbucketIssueKeys } from '../bitbucket/issueKeysExtractor';
@@ -31,7 +31,7 @@ interface PRState {
     repository?: Repository;
 }
 
-const emptyState: PRState = { prData: { type: '', currentBranch: '', relatedJiraIssues: [] } };
+const emptyState: PRState = { prData: { type: '', remote: { name: 'dummy_remote', isReadOnly: true }, currentBranch: '', relatedJiraIssues: [] } };
 
 export class PullRequestWebview extends AbstractReactWebview implements InitializingWebview<PullRequest> {
     private _state: PRState = emptyState;
@@ -178,6 +178,20 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                     vscode.window.showInformationMessage(`Copied pull request link to clipboard - ${linkUrl}`);
                     break;
                 }
+                case 'fetchUsers': {
+                    if (isFetchUsers(msg)) {
+                        handled = true;
+                        try {
+                            const bbApi = await clientForRemote(msg.remote);
+                            const reviewers = await bbApi.pullrequests.getReviewers(msg.remote, msg.query);
+                            this.postMessage({ type: 'fetchUsersResult', users: reviewers });
+                        } catch (e) {
+                            Logger.error(new Error(`error fetching reviewers: ${e}`));
+                            this.postMessage({ type: 'error', reason: e });
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -221,6 +235,7 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
             prData: {
                 type: 'update',
                 pr: pr.data,
+                remote: pr.remote,
                 currentUser: currentUser,
                 currentBranch: pr.repository.state.HEAD!.name!,
                 commits: undefined,
