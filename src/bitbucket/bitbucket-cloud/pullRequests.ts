@@ -22,8 +22,7 @@ export class CloudPullRequestApi implements PullRequestApi {
 
     constructor(site: DetailedSiteInfo, token: string, agent: any) {
         this.client = new Client(
-            site.baseApiUrl,
-            `Bearer ${token}`,
+            site,
             agent,
             async (response: AxiosResponse): Promise<Error> => {
                 let errString = 'Unknown error';

@@ -1,12 +1,17 @@
 import { JiraClient } from './client';
 import { DetailedSiteInfo } from '../../atlclients/authInfo';
+import { AuthorizationInterceptor } from '../../atlclients/authorizationInterceptor';
+import { BasicInterceptor } from '../../atlclients/basicInterceptor';
+import { CredentialManager } from '../../atlclients/authStore';
+
 
 export class JiraServerClient extends JiraClient {
-    private _basicAuth: string | undefined;
+    private _interceptor: AuthorizationInterceptor;
 
-    constructor(username: string, password: string, site: DetailedSiteInfo, agent?: any) {
+    constructor(authStore: CredentialManager, site: DetailedSiteInfo, agent?: any) {
         super(site, agent);
-        this._basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
+        this._interceptor = new BasicInterceptor(site, authStore, this.transport);
+        if (this._interceptor) { console.log('nick is too lazy to figure out how to suppress this error'); }
     }
 
     public async assignIssue(issueIdOrKey: string, accountId: string | undefined): Promise<any> {
@@ -18,9 +23,5 @@ export class JiraServerClient extends JiraClient {
     // Project
     public getProjectSearchPath(): string {
         return 'project';
-    }
-
-    protected authorization(): string {
-        return `Basic ${this._basicAuth}`;
     }
 }

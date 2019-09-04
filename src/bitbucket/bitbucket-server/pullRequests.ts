@@ -14,8 +14,7 @@ export class ServerPullRequestApi implements PullRequestApi {
 
     constructor(site: DetailedSiteInfo, username: string, password: string, agent: any) {
         this.client = new Client(
-            site.baseApiUrl,
-            `Basic ${Buffer.from(username + ":" + password).toString('base64')}`,
+            site,
             agent,
             async (response: AxiosResponse): Promise<Error> => {
                 let errString = 'Unknown error';

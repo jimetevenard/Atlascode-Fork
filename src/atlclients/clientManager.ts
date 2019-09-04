@@ -23,6 +23,7 @@ import { PipelineApiImpl } from "../pipelines/pipelines";
 import { ServerRepositoriesApi } from "../bitbucket/bitbucket-server/repositories";
 import { ServerPullRequestApi } from "../bitbucket/bitbucket-server/pullRequests";
 import { BitbucketIssuesApiImpl } from "../bitbucket/bitbucket-cloud/bbIssues";
+import { CredentialManager } from "./authStore";
 
 const oauthTTL: number = 45 * Interval.MINUTE;
 const serverTTL: number = Interval.FOREVER;
@@ -32,7 +33,7 @@ export class ClientManager implements Disposable {
   private _agent: any | undefined;
   private _agentChanged: boolean = false;
 
-  constructor(context: ExtensionContext) {
+  constructor(context: ExtensionContext, private _credentialManager: CredentialManager) {
     context.subscriptions.push(
       configuration.onDidChange(this.onConfigurationChanged, this)
     );
@@ -121,9 +122,9 @@ export class ClientManager implements Disposable {
         let client: any = undefined;
 
         if (isOAuthInfo(info)) {
-          client = new JiraCloudClient(info.access, site, this._agent);
+          client = new JiraCloudClient(this._credentialManager, site, this._agent);
         } else if (isBasicAuthInfo(info)) {
-          client = new JiraServerClient(info.username, info.password, site, this._agent);
+          client = new JiraServerClient(this._credentialManager, site, this._agent);
         }
 
         return client;

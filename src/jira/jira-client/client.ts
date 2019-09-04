@@ -38,6 +38,10 @@ export abstract class JiraClient {
                 'x-atlassian-force-account-id': 'true',
             }
         });
+
+        // this.transport.interceptors.response.use(function (response) {
+        //     return response;
+        // }, this.errorInterceptor());
     }
 
     // Issue
@@ -91,8 +95,7 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             httpsAgent: this.agent
         });
@@ -119,8 +122,7 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             data: JSON.stringify(data),
             httpsAgent: this.agent
@@ -322,8 +324,6 @@ export abstract class JiraClient {
         return result;
     }
 
-    protected abstract authorization(): string;
-
     protected async getFromJira(url: string, queryParams?: any): Promise<any> {
         url = `${this.baseUrl}/api/${API_VERSION}/${url}`;
         if (queryParams) {
@@ -337,8 +337,7 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             httpsAgent: this.agent
         });
@@ -365,8 +364,7 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             httpsAgent: this.agent,
             ...data
@@ -388,7 +386,6 @@ export abstract class JiraClient {
 
         const res = await this.transport.post(url, formData, {
             headers: {
-                Authorization: this.authorization(),
                 'Content-Type': formData.getHeaders()['content-type'],
             },
             httpsAgent: this.agent,
@@ -404,8 +401,7 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             data: JSON.stringify(params),
             httpsAgent: this.agent
@@ -426,13 +422,18 @@ export abstract class JiraClient {
         const res = await this.transport(url, {
             method: "DELETE",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: this.authorization()
+                "Content-Type": "application/json"
             },
             httpsAgent: this.agent
         });
 
         return res.data;
+    }
+
+    protected errorInterceptor(): (error: any) => any {
+        return (error: any) => {
+            throw error;
+        };
     }
 }
 

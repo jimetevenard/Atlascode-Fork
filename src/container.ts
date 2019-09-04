@@ -63,8 +63,8 @@ export class Container {
         this._config = config;
         this._version = version;
         context.subscriptions.push((this._uriHandler = new AtlascodeUriHandler()));
-        context.subscriptions.push((this._clientManager = new ClientManager(context)));
         context.subscriptions.push((this._credentialManager = new CredentialManager(this._analyticsClient)));
+        context.subscriptions.push((this._clientManager = new ClientManager(context, this._credentialManager)));
         context.subscriptions.push((this._onlineDetector = new OnlineDetector()));
         context.subscriptions.push((this._siteManager = new SiteManager(context.globalState)));
         context.subscriptions.push((this._jiraProjectManager = new JiraProjectManager()));
