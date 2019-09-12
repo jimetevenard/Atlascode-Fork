@@ -12,10 +12,9 @@ import {
     Disposable,
     WorkspaceConfiguration
 } from 'vscode';
-import { extensionId, JiraLegacyWorkingSiteConfigurationKey, JiraWorkingProjectConfigurationKey, JiraDefaultSiteConfigurationKey } from '../constants';
+import { extensionId, JiraLegacyWorkingSiteConfigurationKey, JiraV1WorkingProjectConfigurationKey, JiraDefaultSiteConfigurationKey, JiraDefaultProjectsConfigurationKey } from '../constants';
 import { Container } from '../container';
-import { WorkingProject } from './model';
-import { Project } from '../jira/jira-client/model/entities';
+import { DefaultProjects } from './model';
 
 /*
 Configuration is a helper to manage configuration changes in various parts of the system.
@@ -117,21 +116,15 @@ export class Configuration extends Disposable {
 
     async setDefaultSite(siteId?: string) {
         await this.updateForWorkspace(JiraDefaultSiteConfigurationKey, siteId);
-        await this.updateForWorkspace(JiraWorkingProjectConfigurationKey, undefined);
     }
 
-    async setWorkingProject(project?: Project | WorkingProject) {
-        // It's possible that the working site is being read from the global settings while we're writing to Workspace settings. 
-        // Re-write it to be sure that the site and project are written to the same ConfigurationTarget.
-        const inspect = configuration.inspect(JiraDefaultSiteConfigurationKey);
-        if (inspect && !inspect.workspaceValue) {
-            await this.updateForWorkspace(JiraDefaultSiteConfigurationKey, inspect.globalValue);
-        }
-        await this.updateForWorkspace(JiraWorkingProjectConfigurationKey, project ? {
-            id: project.id,
-            name: project.name,
-            key: project.key
-        } : undefined);
+    async setDefaultProjects(defaultProjects: DefaultProjects) {
+        await this.updateForWorkspace(JiraDefaultProjectsConfigurationKey, defaultProjects);
+    }
+
+    // Moving from V1 to V2 working project became defaultProjects.
+    async clearVersion1WorkingProject() {
+        await this.updateForWorkspace(JiraV1WorkingProjectConfigurationKey, undefined);
     }
 
     private configForOpenWorkspace(): WorkspaceConfiguration | undefined {

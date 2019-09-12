@@ -16,12 +16,12 @@ import { isOpenBitbucketIssueAction } from '../ipc/bitbucketIssueActions';
 import { PipelineInfo } from '../views/pipelines/PipelinesTree';
 import { parseJiraIssueKeys } from '../jira/issueKeyParser';
 import { parseBitbucketIssueKeys } from '../bitbucket/bbIssueKeyParser';
-import { ProductJira } from '../atlclients/authInfo';
+import { ProductJira, DetailedSiteInfo } from '../atlclients/authInfo';
 import { issuesForJQL } from '../jira/issuesForJql';
 import { fetchMinimalIssue } from '../jira/fetchIssue';
 import { MinimalIssue, isMinimalIssue } from '../jira/jira-client/model/entities';
 import { showIssue } from '../commands/jira/showIssue';
-import { clientForRemote } from '../bitbucket/bbUtils';
+import { clientForRemote, siteDetailsForRemote } from '../bitbucket/bbUtils';
 import { transitionIssue } from '../jira/transitionIssue';
 
 interface PRState {
@@ -49,6 +49,14 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
     }
     public get id(): string {
         return "pullRequestDetailsScreen";
+    }
+
+    public get siteOrUndefined(): DetailedSiteInfo | undefined {
+        if (this._pr) {
+            return siteDetailsForRemote(this._pr.remote);
+        }
+
+        return undefined;
     }
 
     initialize(data: PullRequest) {
@@ -116,7 +124,7 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                     break;
                 }
                 case 'deleteComment': {
-                    if (isDeleteComment(msg)){
+                    if (isDeleteComment(msg)) {
                         try {
                             this.deleteComment(msg.commentId);
                         } catch (e) {
@@ -127,7 +135,7 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                     break;
                 }
                 case 'editComment': {
-                    if (isEditComment(msg)){
+                    if (isEditComment(msg)) {
                         try {
                             this.editComment(msg.content, msg.commentId);
                         } catch (e) {
@@ -193,6 +201,9 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                         try {
                             const bbApi = await clientForRemote(msg.remote);
                             const reviewers = await bbApi.pullrequests.getReviewers(msg.remote, msg.query);
+                            if (reviewers.length === 0) {
+                                reviewers.push(...this._pr!.data.participants);
+                            }
                             this.postMessage({ type: 'fetchUsersResult', users: reviewers });
                         } catch (e) {
                             Logger.error(new Error(`error fetching reviewers: ${e}`));
@@ -325,7 +336,12 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
     private async approve(approved: boolean) {
         const bbApi = await clientForRemote(this._state.remote!);
         await bbApi.pullrequests.updateApproval({ repository: this._state.repository!, remote: this._state.remote!, sourceRemote: this._state.sourceRemote, data: this._state.prData.pr! }, approved);
-        prApproveEvent().then(e => { Container.analyticsClient.sendTrackEvent(e); });
+
+        const site: DetailedSiteInfo | undefined = siteDetailsForRemote(this._state.remote!);
+
+        if (site) {
+            prApproveEvent(site).then(e => { Container.analyticsClient.sendTrackEvent(e); });
+        }
         await this.updatePullRequest();
     }
 
@@ -336,7 +352,12 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
             m.closeSourceBranch,
             m.mergeStrategy
         );
-        prMergeEvent().then(e => { Container.analyticsClient.sendTrackEvent(e); });
+
+        const site: DetailedSiteInfo | undefined = siteDetailsForRemote(this._state.remote!);
+
+        if (site) {
+            prMergeEvent(site).then(e => { Container.analyticsClient.sendTrackEvent(e); });
+        }
         await this.updateIssue(m.issue);
         vscode.commands.executeCommand(Commands.BitbucketRefreshPullRequests);
         vscode.commands.executeCommand(Commands.RefreshPipelines);
@@ -370,8 +391,10 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                 .catch(async _ => {
                     await this._state.repository!.addRemote(this._state.sourceRemote!.name, this._state.sourceRemote!.fetchUrl!);
                 });
+
+            await this._state.repository!.fetch(this._state.sourceRemote!.name, this._state.prData.pr!.source!.branchName);
         }
-        await this._state.repository!.fetch(this._state.sourceRemote!.name, this._state.prData.pr!.source!.branchName);
+
         this._state.repository!.checkout(branch || this._state.prData.pr!.source!.branchName)
             .then(() => {
                 this._state.prData.currentBranch = this._state.repository!.state.HEAD!.name!;
@@ -379,7 +402,10 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
                     type: 'checkout',
                     currentBranch: this._state.repository!.state.HEAD!.name!
                 });
-                prCheckoutEvent().then(e => { Container.analyticsClient.sendTrackEvent(e); });
+                const site: DetailedSiteInfo | undefined = siteDetailsForRemote(this._state.sourceRemote!);
+                if (site) {
+                    prCheckoutEvent(site).then(e => { Container.analyticsClient.sendTrackEvent(e); });
+                }
             })
             .catch((e: any) => {
                 Logger.error(new Error(`error checking out the pull request branch: ${e}`));
