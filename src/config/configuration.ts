@@ -97,6 +97,8 @@ export class Configuration extends Disposable {
         await this.updateForWorkspace(JiraLegacyWorkingSiteConfigurationKey, undefined);
     }
 
+    // Migrates the workspace level site settings. This needs to be done for every workspace /directory
+    // the first time it's opened unlike global migrations that can happen on first run of the extension only.
     async migrateLocalVersion1WorkingSite(deletePrevious: boolean) {
         const inspect = configuration.inspect(JiraLegacyWorkingSiteConfigurationKey);
         if (inspect && inspect.workspaceValue) {
@@ -159,13 +161,6 @@ export class Configuration extends Disposable {
             if (value === inspect.workspaceValue) { return; }
 
             await this.update(section, value, ConfigurationTarget.Workspace, resource);
-            return;
-        }
-
-        if (inspect.workspaceValue !== undefined) {
-            if (value === inspect.workspaceValue) { return; }
-
-            await this.update(section, value, ConfigurationTarget.Workspace);
             return;
         }
 
