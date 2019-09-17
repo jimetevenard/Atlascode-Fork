@@ -14,7 +14,6 @@ import { JiraDefaultSiteConfigurationKey, JiraDefaultProjectsConfigurationKey } 
 import { SitesAvailableUpdateEvent } from '../siteManager';
 import { authenticateCloud, authenticateServer, clearAuth } from '../commands/authenticate';
 import { JiraSiteProjectMappingUpdateEvent } from '../jira/projectManager';
-
 export class ConfigWebview extends AbstractReactWebview implements InitializingWebview<SettingSource>{
 
     constructor(extensionPath: string) {

@@ -62,6 +62,12 @@ export class JiraContext extends Disposable {
             const project = await Container.jiraProjectManager.getEffectiveProject(Container.siteManager.effectiveSite(ProductJira));
             this._explorers.forEach(t => t.project = project);
             this._newIssueMonitor.setProject(project);
+
+            //  Delaying the refresh by one second avoids a race condition (the settings have not been fully updated when the refresh happens).
+            //  I'm not sure this is a good way of handling this but I don't know what's causing the race condition.
+            setTimeout(() => {
+                this.refresh();
+            }, 1000);
         }
 
         if (initializing) {
@@ -94,6 +100,10 @@ export class JiraContext extends Disposable {
             setCommandContext(CommandContext.JiraLoginTree, !isLoggedIn);
             this.refresh();
         }
+    }
+
+    async onProjectDidChange(){
+        this.refresh();
     }
 
     async findIssue(issueKey: string): Promise<MinimalORIssueLink | undefined> {
