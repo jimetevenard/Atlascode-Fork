@@ -1,4 +1,4 @@
-import { ExtensionContext, Disposable, env, UriHandler, window, Uri } from 'vscode';
+import { ExtensionContext, Disposable, env, UriHandler } from 'vscode';
 import { configuration, IConfig } from './config/configuration';
 import { ConfigWebview } from './webviews/configWebview';
 import { PullRequestViewManager } from './webviews/pullRequestViewManager';
@@ -25,27 +25,9 @@ import { PmfStats } from './pmf/stats';
 import { SiteManager } from './siteManager';
 import { JiraProjectManager } from './jira/projectManager';
 import { LoginManager } from './atlclients/loginManager';
+import { AtlascodeUriHandler } from './uriHandler';
 
 const isDebuggingRegex = /^--(debug|inspect)\b(-brk\b|(?!-))=?/;
-
-export class AtlascodeUriHandler extends Disposable implements UriHandler {
-    private disposables: Disposable;
-
-    constructor() {
-        super(() => this.dispose());
-        this.disposables = window.registerUriHandler(this);
-    }
-
-    handleUri(uri: Uri): void {
-        if (uri.path.endsWith('openSettings')) {
-            Container.configWebview.createOrShow();
-        }
-    }
-
-    dispose(): void {
-        this.disposables.dispose();
-    }
-}
 
 export class Container {
     static initialize(context: ExtensionContext, config: IConfig, version: string) {
