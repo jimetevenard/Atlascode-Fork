@@ -6,6 +6,7 @@ import Tooltip from '@atlaskit/tooltip';
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
 import EditJQL from "./EditJQL";
+import CommonJQL from "./CommonJQL";
 import { v4 } from "uuid";
 import { ButtonGroup } from "@atlaskit/button";
 import { DetailedSiteInfo } from "../../../atlclients/authInfo";
@@ -22,6 +23,7 @@ export default class CustomJQL extends React.Component<
   {
     inputValue: string;
     editingEntry: JQLEntry | undefined;
+    selectingCommonPreset: boolean;
     editingId: string | undefined;
     dragTargetIndex: number | undefined;
     dragSourceIndex: number | undefined;
@@ -34,6 +36,7 @@ export default class CustomJQL extends React.Component<
       inputValue: "",
       editingEntry: undefined,
       editingId: undefined,
+      selectingCommonPreset: false,
       dragTargetIndex: undefined,
       dragSourceIndex: undefined
     };
@@ -53,6 +56,14 @@ export default class CustomJQL extends React.Component<
     const id = v4();
     this.setState({
       editingId: id,
+      editingEntry: { siteId: "", id: id, name: "", query: "", enabled: true, monitor: true }
+    });
+  }
+
+  onCommonJQL = () => {
+    const id = v4();
+    this.setState({
+      selectingCommonPreset: true,
       editingEntry: { siteId: "", id: id, name: "", query: "", enabled: true, monitor: true }
     });
   }
@@ -118,7 +129,7 @@ export default class CustomJQL extends React.Component<
   }
 
   handleCancelEdit = () => {
-    this.setState({ editingId: undefined, editingEntry: undefined });
+    this.setState({ editingId: undefined, editingEntry: undefined, selectingCommonPreset: false });
   }
 
   indexForId(jqlList: JQLEntry[], id: string | undefined) {
@@ -139,7 +150,8 @@ export default class CustomJQL extends React.Component<
 
     this.setState({
       editingId: undefined,
-      editingEntry: undefined
+      editingEntry: undefined,
+      selectingCommonPreset: false
     });
     this.publishChanges(jqlList);
   }
@@ -282,9 +294,17 @@ export default class CustomJQL extends React.Component<
 
     return (
       <React.Fragment>
-        {this.state.editingEntry && (
+        {this.state.editingEntry && !this.state.selectingCommonPreset && (
           <EditJQL
             jqlFetcher={this.props.jqlFetcher}
+            sites={this.props.sites}
+            jqlEntry={this.state.editingEntry}
+            onCancel={this.handleCancelEdit}
+            onSave={this.handleSaveEdit}
+          />
+        )}
+        {this.state.editingEntry && this.state.selectingCommonPreset && (
+          <CommonJQL
             sites={this.props.sites}
             jqlEntry={this.state.editingEntry}
             onCancel={this.handleCancelEdit}
@@ -296,10 +316,21 @@ export default class CustomJQL extends React.Component<
         {jql.map((_, index) => {
           return this.htmlElementAtIndex(jql, index);
         })}
-        <div style={{ display: 'inline-flex', marginRight: '4px', marginLeft: '4px;' }}>
-          <Button className="ac-button" onClick={this.onNewQuery}>
-            Add Query
-        </Button>
+        <div style={{
+            marginTop: '24px',
+            display: 'flex',
+            justifyContent: 'flex-start'
+        }}>
+          <div style={{ display: 'inline-flex', marginRight: '4px', marginLeft: '4px;' }}>
+            <Button className="ac-button" onClick={this.onNewQuery}>
+              Add Query
+            </Button>
+          </div>
+          <div style={{ display: 'inline-flex', marginRight: '4px', marginLeft: '4px;' }}>
+            <Button className="ac-button" onClick={this.onCommonJQL}>
+              Select Query from Common Presets
+            </Button>
+          </div>
         </div>
       </React.Fragment>
     );

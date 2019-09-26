@@ -84,7 +84,17 @@ export default class JiraExplorer extends React.Component<{
                     paddingLeft: '24px',
                     paddingTop: '10px'
                 }}>
-                    <h4>Custom JQL</h4>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'flex-start'
+                    }}>
+                        <div style={{marginRight: '10px'}}>
+                            <h4>Custom JQL</h4>
+                        </div>
+                        <a href="https://www.atlassian.com/blog/jira-software/jql-the-most-flexible-way-to-search-jira-14">
+                            What is JQL?
+                        </a>
+                    </div>
                     <CustomJQL
                         JqlList={config.jira.jqlList}
                         onConfigChange={this.props.onConfigChange}
