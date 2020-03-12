@@ -52,12 +52,18 @@ export class JiraIssueWebview extends AbstractIssueEditorWebview
     private _issue: MinimalIssue<DetailedSiteInfo>;
     private _editUIData: EditIssueData;
     private _currentUser: User;
+    associatedHintConfig = 'completedTasks.jira.viewedIssueScreen';
 
     constructor(extensionPath: string) {
         super(extensionPath);
         this._issue = createEmptyMinimalIssue(emptySiteInfo);
         this._editUIData = emptyEditIssueData;
         this._currentUser = emptyUser;
+        this.hintProvider.addHint(
+            'The "Start Work" button lets you transition an issue to "in progress", assign it to yourself, create a new branch, and switch to that branch in one action.',
+            () => startWorkOnIssue(this._issue),
+            'completedTasks.jira.startedWork'
+        );
     }
 
     public get title(): string {

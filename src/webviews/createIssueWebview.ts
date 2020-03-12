@@ -66,6 +66,7 @@ export class CreateIssueWebview extends AbstractIssueEditorWebview
     private _selectedIssueTypeId: string;
     private _relatedBBIssue: BitbucketIssue | undefined;
     private _siteDetails: DetailedSiteInfo;
+    associatedHintConfig = 'completedTasks.jira.createdJiraIssue';
 
     constructor(extensionPath: string) {
         super(extensionPath);

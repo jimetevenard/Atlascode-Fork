@@ -12,6 +12,7 @@ import { DetailedSiteInfo, ProductBitbucket } from './atlclients/authInfo';
 import { showBitbucketDebugInfo } from './bitbucket/bbDebug';
 import { BitbucketIssue } from './bitbucket/model';
 import { rerunPipeline } from './commands/bitbucket/rerunPipeline';
+import { HintProvider } from './commands/HintProvider';
 import { assignIssue } from './commands/jira/assignIssue';
 import { createIssue } from './commands/jira/createIssue';
 import { showIssue, showIssueForKey, showIssueForSiteIdAndKey } from './commands/jira/showIssue';
@@ -145,8 +146,18 @@ export function registerCommands(vscodeContext: ExtensionContext) {
             viewScreenEvent(Registry.screen.pullRequestDiffScreen, undefined, ProductBitbucket).then(e => {
                 Container.analyticsClient.sendScreenEvent(e);
             });
+            Container.updateChecklistItem('completedTasks.bitbucket.viewedFileDiff', true);
             diffArgs[0]();
             commands.executeCommand('vscode.diff', ...diffArgs.slice(1));
+            const hintProvider = new HintProvider();
+            hintProvider.addHint(
+                'You can look at this file more closely by pressing the edit pen on the top bar ("Edit this File"). This checks out the branch and lets you use VS Code features like "Get Definition", as well as allowing you to make changes to the file.',
+                () => {
+                    commands.executeCommand(Commands.EditThisFile, diffArgs[2]);
+                },
+                'completedTasks.bitbucket.checkedOutAFile'
+            );
+            hintProvider.showHintNotification();
         }),
         commands.registerCommand(Commands.RerunPipeline, (node: PipelineNode) => {
             rerunPipeline(node.pipeline);

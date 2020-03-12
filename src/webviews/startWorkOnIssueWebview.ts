@@ -23,6 +23,7 @@ const customBranchType: BranchType = { kind: 'Custom', prefix: '' };
 export class StartWorkOnIssueWebview extends AbstractReactWebview
     implements InitializingWebview<MinimalIssue<DetailedSiteInfo>> {
     private _state: MinimalIssue<DetailedSiteInfo> = createEmptyMinimalIssue(emptySiteInfo);
+    associatedHintConfig = 'completedTasks.jira.startedWork';
 
     constructor(extensionPath: string) {
         super(extensionPath);

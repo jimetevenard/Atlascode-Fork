@@ -375,6 +375,11 @@
         "views": {
             "atlascode-drawer": [
                 {
+                    "id": "atlascode.views.checklistTreeView",
+                    "name": "Checklist",
+                    "when": "config.atlascode.checklistEnabled"
+                },
+                {
                     "id": "atlascode.views.jira.customJql",
                     "name": "Jira Issues",
                     "when": "atlascode:jiraExplorerEnabled && config.atlascode.jira.enabled"
@@ -969,6 +974,14 @@
                             "default": ""
                         }
                     }
+                },
+                "atlascode.checklistEnabled": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "atlascode.showHintNotifications": {
+                    "type": "boolean",
+                    "default": true
                 },
                 "atlascode.jira.customJql": {
                     "type": "array",

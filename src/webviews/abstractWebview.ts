@@ -12,6 +12,7 @@ import {
 } from 'vscode';
 import { pmfClosed, pmfSnoozed, viewScreenEvent } from '../analytics';
 import { DetailedSiteInfo, Product } from '../atlclients/authInfo';
+import { HintProvider } from '../commands/HintProvider';
 import { Container } from '../container';
 import { isAction, isAlertable, isPMFSubmitAction } from '../ipc/messaging';
 import { submitPMF } from '../pmf/pmfSubmitter';
@@ -53,12 +54,14 @@ export abstract class AbstractReactWebview implements ReactWebview {
     protected isRefeshing: boolean = false;
     private _viewEventSent: boolean = false;
     private ws: UIWebsocket;
+    protected hintProvider: HintProvider;
+    protected associatedHintConfig: string;
 
     constructor(extensionPath: string) {
         this._extensionPath = extensionPath;
 
         Container.context.subscriptions.push(Container.onlineDetector.onDidOnlineChange(this.onDidOnlineChange, this));
-
+        this.hintProvider = new HintProvider();
         // Note: this is supe rlightweight and does nothing until you call start()
         this.ws = new UIWebsocket(13988);
     }
@@ -125,10 +128,16 @@ export abstract class AbstractReactWebview implements ReactWebview {
             );
 
             this._panel.webview.html = this._getHtmlForWebview(this.id);
+            this.hintProvider.showHintNotification();
+            this.updateChecklist();
         } else {
             this._panel.webview.html = this._getHtmlForWebview(this.id);
             this._panel.reveal(column ? column : ViewColumn.Active); // , false);
         }
+    }
+
+    private updateChecklist() {
+        Container.updateChecklistItem(this.associatedHintConfig, true);
     }
 
     private onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent) {

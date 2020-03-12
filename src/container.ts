@@ -12,10 +12,12 @@ import { PmfStats } from './pmf/stats';
 import { SiteManager } from './siteManager';
 import { OnlineDetector } from './util/online';
 import { AuthStatusBar } from './views/authStatusBar';
+import { JiraActiveIssueStatusBar } from './views/jira/activeIssueStatusBar';
 import { IssueHoverProviderManager } from './views/jira/issueHoverProviderManager';
 import { JiraContext } from './views/jira/jiraContext';
 import { PipelinesExplorer } from './views/pipelines/PipelinesExplorer';
 import { BitbucketIssueViewManager } from './webviews/bitbucketIssueViewManager';
+import { ChecklistExplorer } from './webviews/components/checklistExplorer';
 import { ConfigWebview } from './webviews/configWebview';
 import { CreateBitbucketIssueWebview } from './webviews/createBitbucketIssueWebview';
 import { CreateIssueWebview } from './webviews/createIssueWebview';
@@ -27,7 +29,6 @@ import { PullRequestViewManager } from './webviews/pullRequestViewManager';
 import { StartWorkOnBitbucketIssueWebview } from './webviews/startWorkOnBitbucketIssueWebview';
 import { StartWorkOnIssueWebview } from './webviews/startWorkOnIssueWebview';
 import { WelcomeWebview } from './webviews/welcomeWebview';
-import { JiraActiveIssueStatusBar } from './views/jira/activeIssueStatusBar';
 
 const isDebuggingRegex = /^--(debug|inspect)\b(-brk\b|(?!-))=?/;
 
@@ -114,6 +115,19 @@ export class Container {
         }
     }
 
+    static updateChecklistItem(key: string, value: boolean) {
+        this._context.globalState.update(key, value);
+    }
+
+    static getChecklistItem(key: string): boolean {
+        const result = this._context.globalState.get(key) as boolean | undefined;
+        return result ?? false;
+    }
+
+    static setChecklistExplorer(checklistExplorer: ChecklistExplorer) {
+        this._checklistExplorer = checklistExplorer;
+    }
+
     static initializeBitbucket(bbCtx: BitbucketContext) {
         this._bitbucketContext = bbCtx;
         this._pipelinesExplorer = new PipelinesExplorer(bbCtx);
@@ -141,6 +155,11 @@ export class Container {
         }
 
         return this._isDebugging;
+    }
+
+    private static _checklistExplorer: ChecklistExplorer;
+    static get checklistExplorer() {
+        return this._checklistExplorer;
     }
 
     private static _uriHandler: UriHandler;

@@ -38,6 +38,17 @@ export interface IConfig {
     enableCurlLogging: boolean;
     enableHttpsTunnel: boolean;
     onlineCheckerUrls: string[];
+    checklistEnabled: boolean;
+    showHintNotifications: boolean;
+}
+
+export interface HintNotification {
+    body: string;
+    actionDescription: string;
+    action: () => void;
+    disableHintsDescription: string;
+    disableHints: () => void;
+    configToWatch: string;
 }
 
 export interface JiraConfig {
@@ -314,5 +325,7 @@ export const emptyConfig: IConfig = {
     enableUIWS: false,
     enableCurlLogging: false,
     enableHttpsTunnel: false,
-    onlineCheckerUrls: []
+    onlineCheckerUrls: [],
+    checklistEnabled: true,
+    showHintNotifications: true
 };

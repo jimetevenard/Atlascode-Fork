@@ -1,10 +1,10 @@
-import { JQLTreeDataProvider } from './jqlTreeDataProvider';
-import { IssueNode } from '../nodes/issueNode';
 import { JQLEntry } from 'src/config/model';
-import { AbstractBaseNode } from '../nodes/abstractBaseNode';
-import { TreeItem, TreeItemCollapsibleState, Disposable } from 'vscode';
+import { Disposable, TreeItem, TreeItemCollapsibleState } from 'vscode';
 import { Container } from '../../container';
 import { MAX_RESULTS } from '../../jira/issuesForJql';
+import { AbstractBaseNode } from '../nodes/abstractBaseNode';
+import { IssueNode } from '../nodes/issueNode';
+import { JQLTreeDataProvider } from './jqlTreeDataProvider';
 
 export class CustomJQLTree extends JQLTreeDataProvider implements AbstractBaseNode {
     public readonly disposables: Disposable[] = [];
