@@ -1,13 +1,23 @@
 import { window } from 'vscode';
 import { configuration } from '../config/configuration';
-import { HintNotification } from '../config/model';
 import { Container } from '../container';
 
+interface HintNotification {
+    body: string;
+    actionDescription: string;
+    action: () => void;
+    disableHintsDescription: string;
+    disableHints: () => void;
+    configToWatch: string;
+}
+
 export class HintProvider {
-    private hintNotifications: HintNotification[];
+    private hintMap: Map<string, HintNotification>;
+    private alreadyShown: Set<string>;
 
     constructor() {
-        this.hintNotifications = [];
+        this.hintMap = new Map<string, HintNotification>();
+        this.alreadyShown = new Set<string>();
     }
 
     private buildHintNotification(
@@ -41,24 +51,30 @@ export class HintProvider {
     }
 
     public addHint(body: string, action: () => void, configToWatch: string, actionDescription?: string) {
-        this.hintNotifications.push(this.buildHintNotification(body, action, configToWatch, actionDescription));
+        this.hintMap.set(body, this.buildHintNotification(body, action, configToWatch, actionDescription));
     }
 
-    public showHintNotification() {
-        if (this.hintNotifications.length === 0 || !Container.config.showHintNotifications) {
+    public showHintNotification(noRepeat?: boolean) {
+        const hintNotifications = Array.from(this.hintMap.values());
+        if (hintNotifications.length === 0 || !Container.config.showHintNotifications) {
             return;
         }
 
         //Pick a random action to suggest that the user hasn't completed
-        const notComplete = this.hintNotifications.filter(
-            notification => !Container.getChecklistItem(notification.configToWatch)
-        );
+        const notComplete = hintNotifications.filter(notification => {
+            //Check if the action has already been completed or if we're showing an action that has already been shown
+            return !(
+                Container.hintChecklist.getChecklistItem(notification.configToWatch) ||
+                (noRepeat && this.alreadyShown.has(notification.body))
+            );
+        });
 
         if (notComplete.length === 0) {
             return;
         }
 
         const randomNotification = notComplete[Math.floor(Math.random() * notComplete.length)];
+        this.alreadyShown.add(randomNotification.body);
 
         window
             .showInformationMessage(

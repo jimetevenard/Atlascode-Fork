@@ -23,7 +23,6 @@ import {
 } from './pipelines/yaml/pipelinesYamlHelper';
 import { registerResources } from './resources';
 import { GitExtension } from './typings/git';
-import { ChecklistExplorer } from './webviews/components/checklistExplorer';
 
 const AnalyticDelay = 5000;
 
@@ -96,7 +95,6 @@ async function activateBitbucketFeatures() {
     try {
         const gitApi = gitExtension.exports.getAPI(1);
         const bbContext = new BitbucketContext(gitApi);
-        Container.setChecklistExplorer(new ChecklistExplorer());
         Container.initializeBitbucket(bbContext);
     } catch (e) {
         Logger.error(e, 'Activating Bitbucket features failed');

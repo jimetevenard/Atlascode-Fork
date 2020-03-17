@@ -42,15 +42,6 @@ export interface IConfig {
     showHintNotifications: boolean;
 }
 
-export interface HintNotification {
-    body: string;
-    actionDescription: string;
-    action: () => void;
-    disableHintsDescription: string;
-    disableHints: () => void;
-    configToWatch: string;
-}
-
 export interface JiraConfig {
     enabled: boolean;
     workingProject: WorkingProjectV1;

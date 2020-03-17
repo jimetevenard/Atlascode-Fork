@@ -213,7 +213,7 @@ export class PullRequestCommentController implements vscode.Disposable {
                     commands.executeCommand('vscode.open', pathURI, { viewColumn: -2 }); // -2 represents displays the new file 'beside' the current editor
                 }
 
-                Container.updateChecklistItem('completedTasks.bitbucket.checkedOutAFile', true);
+                Container.hintChecklist.updateChecklistItem('completedTasks.bitbucket.checkedOutAFile', true);
             })
         );
         this._commentController.commentingRangeProvider = {

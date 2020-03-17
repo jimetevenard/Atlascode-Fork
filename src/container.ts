@@ -21,6 +21,7 @@ import { ChecklistExplorer } from './webviews/components/checklistExplorer';
 import { ConfigWebview } from './webviews/configWebview';
 import { CreateBitbucketIssueWebview } from './webviews/createBitbucketIssueWebview';
 import { CreateIssueWebview } from './webviews/createIssueWebview';
+import { HintChecklist } from './webviews/hintChecklist';
 import { JiraIssueViewManager } from './webviews/jiraIssueViewManager';
 import { OnboardingWebview } from './webviews/Onboarding';
 import { PipelineViewManager } from './webviews/pipelineViewManager';
@@ -100,6 +101,9 @@ export class Container {
 
         this._pmfStats = new PmfStats(context);
 
+        this._hintChecklist = new HintChecklist(context.globalState);
+        this._checklistExplorer = new ChecklistExplorer();
+
         this._loginManager = new LoginManager(this._credentialManager, this._siteManager, this._analyticsClient);
 
         if (config.jira.explorer.enabled) {
@@ -113,19 +117,6 @@ export class Container {
                 }
             });
         }
-    }
-
-    static updateChecklistItem(key: string, value: boolean) {
-        this._context.globalState.update(key, value);
-    }
-
-    static getChecklistItem(key: string): boolean {
-        const result = this._context.globalState.get(key) as boolean | undefined;
-        return result ?? false;
-    }
-
-    static setChecklistExplorer(checklistExplorer: ChecklistExplorer) {
-        this._checklistExplorer = checklistExplorer;
     }
 
     static initializeBitbucket(bbCtx: BitbucketContext) {
@@ -315,5 +306,10 @@ export class Container {
     private static _pmfStats: PmfStats;
     static get pmfStats() {
         return this._pmfStats;
+    }
+
+    private static _hintChecklist: HintChecklist;
+    static get hintChecklist() {
+        return this._hintChecklist;
     }
 }

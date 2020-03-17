@@ -137,7 +137,7 @@ export abstract class AbstractReactWebview implements ReactWebview {
     }
 
     private updateChecklist() {
-        Container.updateChecklistItem(this.associatedHintConfig, true);
+        Container.hintChecklist.updateChecklistItem(this.associatedHintConfig, true);
     }
 
     private onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent) {

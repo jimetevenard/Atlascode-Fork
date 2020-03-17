@@ -146,7 +146,7 @@ export function registerCommands(vscodeContext: ExtensionContext) {
             viewScreenEvent(Registry.screen.pullRequestDiffScreen, undefined, ProductBitbucket).then(e => {
                 Container.analyticsClient.sendScreenEvent(e);
             });
-            Container.updateChecklistItem('completedTasks.bitbucket.viewedFileDiff', true);
+            Container.hintChecklist.updateChecklistItem('completedTasks.bitbucket.viewedFileDiff', true);
             diffArgs[0]();
             commands.executeCommand('vscode.diff', ...diffArgs.slice(1));
             const hintProvider = new HintProvider();

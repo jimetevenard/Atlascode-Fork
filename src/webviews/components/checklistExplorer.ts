@@ -3,13 +3,12 @@ import { Commands } from '../../commands';
 import { HintProvider } from '../../commands/HintProvider';
 import { ChecklistTreeId } from '../../constants';
 import { Container } from '../../container';
-import { Explorer } from '../../views/Explorer';
 
-export class ChecklistExplorer extends Explorer {
-    private timer: any;
+export class ChecklistExplorer /* extends Explorer */ {
+    //private timer: any;
     private hintProvider: HintProvider;
     constructor() {
-        super(() => this.dispose());
+        //super(() => this.dispose());
         this.hintProvider = new HintProvider();
 
         if (Container.config.jira.enabled) {
@@ -35,7 +34,7 @@ export class ChecklistExplorer extends Explorer {
 
         //Suggest a hint every hour
         this.hintProvider.showHintNotification();
-        this.timer = setInterval(() => {
+        /* this.timer = */ setInterval(() => {
             this.hintProvider.showHintNotification();
         }, 60 * 60 * 1000);
     }
@@ -48,8 +47,10 @@ export class ChecklistExplorer extends Explorer {
         return ChecklistTreeId;
     }
 
+    /*
     dispose() {
         super.dispose();
         clearInterval(this.timer);
     }
+    */
 }

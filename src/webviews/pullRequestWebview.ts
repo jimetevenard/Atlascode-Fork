@@ -53,7 +53,6 @@ import { AbstractReactWebview, InitializingWebview } from './abstractWebview';
 export class PullRequestWebview extends AbstractReactWebview implements InitializingWebview<PullRequest> {
     private _pr: PullRequest | undefined = undefined;
     private readyForData: boolean = false;
-    private hasShownHint: boolean = false;
     associatedHintConfig = 'completedTasks.bitbucket.viewedPullRequest';
 
     constructor(extensionPath: string) {
@@ -383,17 +382,14 @@ export class PullRequestWebview extends AbstractReactWebview implements Initiali
         this.fetchChangedFiles(bbApi, this._pr).then(async fileDiffs => {
             await readyForDataPromise;
             this.postMessage({ type: 'updateDiffs', fileDiffs: fileDiffs });
-            if (!this.hasShownHint) {
-                this.hintProvider.addHint(
-                    'You can review a file diff by pressing on one of the files in the diff list.',
-                    () => {
-                        this.openDiffViewForFile(this._pr!, fileDiffs[0].fileChange!);
-                    },
-                    'completedTasks.bitbucket.viewedFileDiff'
-                );
-                this.hintProvider.showHintNotification();
-                this.hasShownHint = true;
-            }
+            this.hintProvider.addHint(
+                'You can review a file diff by pressing on one of the files in the diff list.',
+                () => {
+                    this.openDiffViewForFile(this._pr!, fileDiffs[0].fileChange!);
+                },
+                'completedTasks.bitbucket.viewedFileDiff'
+            );
+            this.hintProvider.showHintNotification(true);
         });
 
         this._pr = await prPromise;
