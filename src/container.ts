@@ -13,8 +13,10 @@ import { JiraSettingsManager } from './jira/settingsManager';
 import { CancellationManager } from './lib/cancellation';
 import { BitbucketIssueAction } from './lib/ipc/fromUI/bbIssue';
 import { ConfigAction } from './lib/ipc/fromUI/config';
+import { StartWorkAction } from './lib/ipc/fromUI/startWork';
 import { ConfigTarget } from './lib/ipc/models/config';
 import { SectionChangeMessage } from './lib/ipc/toUI/config';
+import { StartWorkIssueMessage } from './lib/ipc/toUI/startWork';
 import { CommonActionMessageHandler } from './lib/webview/controller/common/commonActionMessageHandler';
 import { SiteManager } from './siteManager';
 import { AtlascodeUriHandler, SETTINGS_URL } from './uriHandler';
@@ -32,6 +34,8 @@ import { VSCConfigActionApi } from './webview/config/vscConfigActionApi';
 import { VSCConfigWebviewControllerFactory } from './webview/config/vscConfigWebviewControllerFactory';
 import { MultiWebview } from './webview/multiViewFactory';
 import { SingleWebview } from './webview/singleViewFactory';
+import { VSCStartWorkActionApi } from './webview/startwork/vscStartWorkActionApi';
+import { VSCStartWorkWebviewControllerFactory } from './webview/startwork/vscStartWorkWebviewControllerFactory';
 import { BitbucketIssueViewManager } from './webviews/bitbucketIssueViewManager';
 import { ConfigWebview } from './webviews/configWebview';
 import { CreateBitbucketIssueWebview } from './webviews/createBitbucketIssueWebview';
@@ -118,8 +122,19 @@ export class Container {
             this._analyticsApi
         );
 
+        const startWorkV2ViewFactory = new SingleWebview<StartWorkIssueMessage, StartWorkAction>(
+            context.extensionPath,
+            new VSCStartWorkWebviewControllerFactory(
+                new VSCStartWorkActionApi(),
+                this._commonMessageHandler,
+                this._analyticsApi
+            ),
+            this._analyticsApi
+        );
+
         context.subscriptions.push((this._settingsWebviewFactory = settingsV2ViewFactory));
         context.subscriptions.push((this._bitbucketIssueWebviewFactory = bitbucketIssuePageV2ViewFactory));
+        context.subscriptions.push((this._startWorkWebviewFactory = startWorkV2ViewFactory));
 
         this._pmfStats = new PmfStats(context);
 
@@ -218,6 +233,11 @@ export class Container {
     private static _bitbucketIssueWebviewFactory: MultiWebview<any, ConfigAction>;
     static get bitbucketIssueWebviewFactory() {
         return this._bitbucketIssueWebviewFactory;
+    }
+
+    private static _startWorkWebviewFactory: SingleWebview<StartWorkIssueMessage, StartWorkAction>;
+    static get startWorkWebviewFactory() {
+        return this._startWorkWebviewFactory;
     }
 
     private static _welcomeWebview: WelcomeWebview;
