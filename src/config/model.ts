@@ -37,6 +37,7 @@ export interface IConfig {
     enableUIWS: boolean;
     enableCurlLogging: boolean;
     enableHttpsTunnel: boolean;
+    forceRootCA: boolean;
     onlineCheckerUrls: string[];
 }
 
@@ -314,5 +315,6 @@ export const emptyConfig: IConfig = {
     enableUIWS: false,
     enableCurlLogging: false,
     enableHttpsTunnel: false,
+    forceRootCA: false,
     onlineCheckerUrls: [],
 };

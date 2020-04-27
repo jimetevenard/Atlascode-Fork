@@ -777,6 +777,12 @@
                     "description": "Enables logging the cUrl commands used by the extension",
                     "scope": "window"
                 },
+                "atlascode.forceRootCA": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Forces the use of ssl-root-cas to fix some cert issues",
+                    "scope": "window"
+                },
                 "atlascode.enableHttpsTunnel": {
                     "type": "boolean",
                     "default": false,

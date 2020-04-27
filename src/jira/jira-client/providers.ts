@@ -50,6 +50,7 @@ export const jiraServerAuthProvider = (username: string, password: string): Auth
 export const getAgent: AgentProvider = (site?: SiteInfo) => {
     let agent = {};
     try {
+        const forceCA = configuration.get<boolean>('forceRootCA');
         if (site) {
             if (site.customSSLCertPaths && site.customSSLCertPaths.trim() !== '') {
                 const cas = sslRootCas.create();
@@ -65,6 +66,10 @@ export const getAgent: AgentProvider = (site?: SiteInfo) => {
             } else if (site.pfxPath && site.pfxPath.trim() !== '') {
                 const pfxFile = fs.readFileSync(site.pfxPath);
 
+                if (forceCA) {
+                    https.globalAgent.options.ca = sslRootCas.create();
+                }
+
                 agent = {
                     httpsAgent: new https.Agent({
                         pfx: pfxFile,
@@ -75,6 +80,10 @@ export const getAgent: AgentProvider = (site?: SiteInfo) => {
         }
 
         if (!agent['httpsAgent']) {
+            if (forceCA) {
+                https.globalAgent.options.ca = sslRootCas.create();
+            }
+
             if (configuration.get<boolean>('enableHttpsTunnel')) {
                 let shouldTunnel: boolean = true;
                 if (site) {
