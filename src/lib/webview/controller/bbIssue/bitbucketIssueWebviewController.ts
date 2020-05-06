@@ -184,6 +184,8 @@ export class BitbucketIssueWebviewController implements WebviewController<Bitbuc
                 }
                 break;
             }
+
+            case CommonActionType.OpenJiraIssue:
             case CommonActionType.Cancel:
             case CommonActionType.SubmitFeedback:
             case CommonActionType.ExternalLink:
