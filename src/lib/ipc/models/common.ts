@@ -13,6 +13,8 @@ export enum WebViewID {
     OnboardingWebview = 'atlascodeOnboarding',
     WelcomeWebview = 'atlascodeWelcomeScreen',
     StartWork = 'startWork',
+
+    JiraCreateIssue = 'atlascodeCreateIssueScreen',
 }
 
 export enum KnownLinkID {
