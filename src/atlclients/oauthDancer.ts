@@ -1,5 +1,6 @@
 import { getProxyHostAndPort } from '@atlassianlabs/pi-client-common';
 import axios, { AxiosInstance } from 'axios';
+import * as crypto from 'crypto';
 import EventEmitter from 'eventemitter3';
 import * as express from 'express';
 import * as http from 'http';
@@ -10,6 +11,7 @@ import { promisify } from 'util';
 import { v4 } from 'uuid';
 import * as vscode from 'vscode';
 import { Disposable } from 'vscode';
+import { AxiosUserAgent } from '../constants';
 import { Container } from '../container';
 import { getAgent } from '../jira/jira-client/providers';
 import { Logger } from '../logger';
@@ -27,7 +29,6 @@ import {
 } from './authInfo';
 import { addCurlLogging } from './interceptors';
 import { BitbucketProdStrategy, BitbucketStagingStrategy, JiraProdStrategy, JiraStagingStrategy } from './strategy';
-import { AxiosUserAgent } from '../constants';
 
 declare interface ResponseEvent {
     provider: OAuthProvider;
@@ -78,7 +79,16 @@ export class OAuthDancer implements Disposable {
         this.forceShutdownAll();
     }
 
-    private getAuthorizeURL(provider: OAuthProvider, state: string): string {
+    // Dependency: Node.js crypto module
+    // https://nodejs.org/api/crypto.html#crypto_crypto
+    private base64URLEncode(str: Buffer): string {
+        return str.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+    private sha256(buffer: Buffer) {
+        return crypto.createHash('sha256').update(buffer).digest();
+    }
+
+    private getAuthorizeURL(provider: OAuthProvider, state: string, challenge: string): string {
         let finalUrl = '';
 
         switch (provider) {
@@ -90,6 +100,8 @@ export class OAuthDancer implements Disposable {
                 url.searchParams.append('scope', JiraProdStrategy.scope);
                 url.searchParams.append('audience', JiraProdStrategy.authParams.audience);
                 url.searchParams.append('prompt', JiraProdStrategy.authParams.prompt);
+                url.searchParams.append('code_challenge', challenge);
+                url.searchParams.append('code_challenge_method', 'S256');
                 url.searchParams.append('state', state);
 
                 finalUrl = url.toString();
@@ -192,6 +204,9 @@ export class OAuthDancer implements Disposable {
         }
 
         const state = v4();
+        const verifier = this.base64URLEncode(crypto.randomBytes(32));
+        const challenge = this.base64URLEncode(this.sha256(Buffer.from(verifier)));
+
         const cancelPromise = new PCancelable<OAuthResponse>((resolve, reject, onCancel) => {
             const myState = state;
             const responseListener = async (respEvent: ResponseEvent) => {
@@ -225,7 +240,12 @@ export class OAuthDancer implements Disposable {
                         let user: UserInfo = emptyUserInfo;
 
                         if (product === ProductJira) {
-                            tokens = await this.getJiraTokens(respEvent.strategy, respEvent.req.query.code, agent);
+                            tokens = await this.getJiraTokens(
+                                respEvent.strategy,
+                                respEvent.req.query.code,
+                                agent,
+                                verifier
+                            );
                             accessibleResources = await this.getJiraResources(
                                 respEvent.strategy,
                                 tokens.accessToken,
@@ -321,7 +341,7 @@ export class OAuthDancer implements Disposable {
             this.startShutdownChecker();
         }
 
-        vscode.env.openExternal(vscode.Uri.parse(this.getAuthorizeURL(provider, state)));
+        vscode.env.openExternal(vscode.Uri.parse(this.getAuthorizeURL(provider, state, challenge)));
 
         return pTimeout<OAuthResponse, OAuthResponse>(
             cancelPromise,
@@ -333,7 +353,12 @@ export class OAuthDancer implements Disposable {
         );
     }
 
-    private async getJiraTokens(strategy: any, code: string, agent: { [k: string]: any }): Promise<Tokens> {
+    private async getJiraTokens(
+        strategy: any,
+        code: string,
+        agent: { [k: string]: any },
+        verifier: string
+    ): Promise<Tokens> {
         try {
             const [proxyHost, proxyPort] = getProxyHostAndPort();
             if (proxyHost.trim() !== '') {
@@ -350,8 +375,8 @@ export class OAuthDancer implements Disposable {
                 data: JSON.stringify({
                     grant_type: 'authorization_code',
                     client_id: strategy.clientID,
-                    client_secret: strategy.clientSecret,
                     code: code,
+                    code_verifier: verifier,
                     redirect_uri: strategy.callbackURL,
                 }),
                 ...agent,
