@@ -24,6 +24,7 @@ import { EditIssueData, emptyEditIssueData, isIssueCreated } from '../../../ipc/
 import { LegacyPMFData } from '../../../ipc/messaging';
 import { ConnectionTimeout } from '../../../util/time';
 import { AtlLoader } from '../AtlLoader';
+import { handleBrokenImageForSite } from '../brokenImageHandler';
 import ErrorBanner from '../ErrorBanner';
 import Offline from '../Offline';
 import PMFBBanner from '../pmfBanner';
@@ -65,10 +66,20 @@ const emptyState: ViewState = {
 export default class JiraIssuePage extends AbstractIssueEditorPage<Emit, Accept, {}, ViewState> {
     private advancedSidebarFields: FieldUI[] = [];
     private advancedMainFields: FieldUI[] = [];
+    private brokenImageHandlerRegistered: boolean = false;
 
     constructor(props: any) {
         super(props);
         this.state = emptyState;
+    }
+
+    private registerBrokenImageHandler(baseLinkUrl: string) {
+        if (!this.brokenImageHandlerRegistered) {
+            this.brokenImageHandlerRegistered = true;
+            window.addEventListener('error', (ee: ErrorEvent) => handleBrokenImageForSite(ee, baseLinkUrl), {
+                capture: true,
+            });
+        }
     }
 
     getProjectKey = (): string => {
@@ -92,6 +103,7 @@ export default class JiraIssuePage extends AbstractIssueEditorPage<Emit, Accept,
                             loadingField: '',
                         },
                     });
+                    this.registerBrokenImageHandler(issueData.siteDetails.baseLinkUrl);
                     break;
                 }
                 case 'epicChildrenUpdate': {
