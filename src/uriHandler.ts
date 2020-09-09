@@ -54,7 +54,7 @@ export class AtlascodeUriHandler implements Disposable, UriHandler {
     private async handlePullRequestUri(uri: Uri) {
         try {
             const query = new URLSearchParams(uri.query);
-            const prUrl = decodeURIComponent(query.get('q') || '');
+            //            const prUrl = decodeURIComponent(query.get('q') || '');
             if (!prUrl) {
                 throw new Error(`Cannot parse pull request URL from: ${query}`);
             }
