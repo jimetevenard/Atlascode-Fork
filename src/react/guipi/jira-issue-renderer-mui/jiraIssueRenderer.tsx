@@ -347,6 +347,37 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
             />
         );
     }
+
+    public renderAttachment(field: FieldUI): JSX.Element {
+        return (
+            <AttachmentForm
+                onChange={(files: File[]) => {
+                    if (Array.isArray(files)) {
+                        if (files.length > 0) {
+                            this._dispatch({
+                                type: CreateJiraIssueUIActionType.FieldUpdate,
+                                fieldUI: field,
+                                value: undefined,
+                            });
+                        }
+
+                        const serFiles = files.map((file: any) => ({
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            path: file.path,
+                        }));
+
+                        this._dispatch({
+                            type: CreateJiraIssueUIActionType.FieldUpdate,
+                            fieldUI: field,
+                            value: serFiles,
+                        });
+                    }
+                }}
+            />
+        );
+    }
 }
 
 export const IssueLink = (props: any) => {

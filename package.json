@@ -1392,6 +1392,7 @@
         "lodash.orderby": "^4.6.0",
         "lodash.truncate": "^4.4.2",
         "macaddress": "^0.2.9",
+        "material-ui-dropzone": "^3.5.0",
         "merge-anything": "^3.0.3",
         "mustache": "^4.0.1",
         "p-any": "^2.1.0",

@@ -163,6 +163,8 @@ export class CreateIssueUIHelper<S extends JiraSiteInfo, C> {
                     this._delegate.isFieldWaiting(issueFieldUI)
                 );
             }
+            case UIType.Attachment:
+                return this._renderer.renderAttachment(fieldUI);
         }
 
         return undefined;
