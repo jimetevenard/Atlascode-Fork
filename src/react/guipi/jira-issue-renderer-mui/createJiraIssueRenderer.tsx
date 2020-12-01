@@ -3,14 +3,15 @@ import { FieldUI, InputFieldUI, SelectFieldUI } from '@atlassianlabs/jira-pi-met
 import { Avatar, Grid, MenuItem, TextField, Typography } from '@material-ui/core';
 import React from 'react';
 import { IssueRenderer } from '../../../lib/guipi/jira-issue-renderer/src/issueRenderer';
-import { JiraIssueUIAction, JiraIssueUIActionType } from '../../atlascode/issue/jiraIssueController';
+import {
+    CreateJiraIssueUIAction,
+    CreateJiraIssueUIActionType,
+} from '../../atlascode/issue/createJiraIssuePageController';
 
-//TODO: At some point we need to look into how much can be shared with the create issue renderer
-//A lot could be shared in a common issue renderer
-export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
-    private _dispatch: React.Dispatch<JiraIssueUIAction>;
+export class CreateJiraIssueRenderer implements IssueRenderer<JSX.Element> {
+    private _dispatch: React.Dispatch<CreateJiraIssueUIAction>;
 
-    constructor(dispatch: React.Dispatch<JiraIssueUIAction>) {
+    constructor(dispatch: React.Dispatch<CreateJiraIssueUIAction>) {
         this._dispatch = dispatch;
     }
 
@@ -25,7 +26,6 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 key={field.key}
                 name={field.key}
                 label={field.name}
-                value={value ?? ''}
                 fullWidth
                 // inputRef={register({
                 //     required: 'Base URL is required',
@@ -33,7 +33,7 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 // })}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     this._dispatch({
-                        type: JiraIssueUIActionType.FieldUpdate,
+                        type: CreateJiraIssueUIActionType.FieldUpdate,
                         fieldUI: field,
                         value: e.target.value,
                     });
@@ -53,7 +53,6 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 key={field.key}
                 name={field.key}
                 label={field.name}
-                value={value ?? ''}
                 fullWidth
                 multiline
                 rows={5}
@@ -63,7 +62,7 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 // })}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     this._dispatch({
-                        type: JiraIssueUIActionType.FieldUpdate,
+                        type: CreateJiraIssueUIActionType.FieldUpdate,
                         fieldUI: field,
                         value: e.target.value,
                     });
@@ -81,7 +80,7 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 value={value?.id || ''}
                 onChange={(event: React.ChangeEvent<{ name?: string | undefined; value: any }>) => {
                     this._dispatch({
-                        type: JiraIssueUIActionType.FieldUpdate,
+                        type: CreateJiraIssueUIActionType.FieldUpdate,
                         fieldUI: field,
                         value: options.find((option) => option.id === event.target.value),
                     });
@@ -116,7 +115,7 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
                 value={value?.id || ''}
                 onChange={(event: React.ChangeEvent<{ name?: string | undefined; value: any }>) => {
                     this._dispatch({
-                        type: JiraIssueUIActionType.FieldUpdate,
+                        type: CreateJiraIssueUIActionType.FieldUpdate,
                         fieldUI: field,
                         value: options.find((option) => option.id === event.target.value),
                     });

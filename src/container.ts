@@ -1,5 +1,7 @@
+import { MinimalIssue } from '@atlassianlabs/jira-pi-common-models';
 import { Disposable, env, ExtensionContext, UriHandler, workspace } from 'vscode';
 import { AnalyticsClient } from './analytics-node-client/src/index';
+import { DetailedSiteInfo } from './atlclients/authInfo';
 import { CredentialManager } from './atlclients/authStore';
 import { ClientManager } from './atlclients/clientManager';
 import { LoginManager } from './atlclients/loginManager';
@@ -15,6 +17,7 @@ import { BitbucketIssueAction } from './lib/ipc/fromUI/bbIssue';
 import { ConfigAction } from './lib/ipc/fromUI/config';
 import { CreateBitbucketIssueAction } from './lib/ipc/fromUI/createBitbucketIssue';
 import { CreateJiraIssueAction } from './lib/ipc/fromUI/createJiraIssue';
+import { JiraIssueAction } from './lib/ipc/fromUI/jiraIssue';
 import { OnboardingAction } from './lib/ipc/fromUI/onboarding';
 import { PipelineSummaryAction } from './lib/ipc/fromUI/pipelineSummary';
 import { PullRequestDetailsAction } from './lib/ipc/fromUI/pullRequestDetails';
@@ -47,6 +50,8 @@ import { VSCConfigWebviewControllerFactory } from './webview/config/vscConfigWeb
 import { ExplorerFocusManager } from './webview/ExplorerFocusManager';
 import { VSCCreateJiraIssueActionImpl } from './webview/issue/vscCreateJiraIssueActionApi';
 import { VSCCreateJiraIssueWebviewControllerFactory } from './webview/issue/vscCreateJiraIssueWebviewControllerFactory';
+import { VSCJiraIssueActionImpl } from './webview/issue/vscJiraIssueActionApi';
+import { VSCJiraIssueWebviewControllerFactory } from './webview/issue/vscJiraIssueWebviewControllerFactory';
 import { MultiWebview } from './webview/multiViewFactory';
 import { VSCOnboardingActionApi } from './webview/onboarding/vscOnboardingActionApi';
 import { VSCOnboardingWebviewControllerFactory } from './webview/onboarding/vscOnboardingWebviewControllerFactory';
@@ -171,12 +176,23 @@ export class Container {
             this._analyticsApi
         );
 
+        const jiraIssueV2WebviewFactory = new MultiWebview<MinimalIssue<DetailedSiteInfo>, JiraIssueAction>(
+            context.extensionPath,
+            new VSCJiraIssueWebviewControllerFactory(
+                new VSCJiraIssueActionImpl(),
+                this._commonMessageHandler,
+                this._analyticsApi
+            ),
+            this._analyticsApi
+        );
+
         context.subscriptions.push((this._settingsWebviewFactory = settingsV2ViewFactory));
         context.subscriptions.push((this._onboardingWebviewFactory = onboardingV2ViewFactory));
         context.subscriptions.push((this._welcomeWebviewFactory = welcomeV2ViewFactory));
         context.subscriptions.push((this._startWorkWebviewFactory = startWorkV2ViewFactory));
         context.subscriptions.push((this._createPullRequestWebviewFactory = createPullRequestV2ViewFactory));
         context.subscriptions.push((this._createJiraIssueWebviewFactory = createJiraIssueV2WebviewFactory));
+        context.subscriptions.push((this._jiraIssueWebviewFactory = jiraIssueV2WebviewFactory));
 
         const pipelinesV2Webview = new MultiWebview<Pipeline, PipelineSummaryAction>(
             context.extensionPath,
@@ -312,6 +328,11 @@ export class Container {
     private static _explorerFocusManager: ExplorerFocusManager;
     static get explorerFocusManager() {
         return this._explorerFocusManager;
+    }
+
+    private static _jiraIssueWebviewFactory: MultiWebview<MinimalIssue<DetailedSiteInfo>, JiraIssueAction>;
+    static get jiraIssueWebviewFactory() {
+        return this._jiraIssueWebviewFactory;
     }
 
     private static _settingsWebviewFactory: SingleWebview<SectionChangeMessage, ConfigAction>;

@@ -6,6 +6,7 @@ import {
     MinimalIssue,
     MinimalIssueOrKeyAndSite,
 } from '@atlassianlabs/jira-pi-common-models';
+import { v4 } from 'uuid';
 import * as vscode from 'vscode';
 import { DetailedSiteInfo, emptySiteInfo, ProductJira } from '../../atlclients/authInfo';
 import { Container } from '../../container';
@@ -24,7 +25,14 @@ export async function showIssue(issueOrKeyAndSite: MinimalIssueOrKeyAndSite<Deta
             issueKey = issueOrKeyAndSite.key;
             site = issueOrKeyAndSite.siteDetails;
         } else {
-            Container.jiraIssueViewManager.createOrShow(createIssueNotFoundIssue(createEmptyMinimalIssue(site)));
+            if (Container.isDebugging) {
+                Container.jiraIssueWebviewFactory.createOrShow(
+                    v4(), //Issue view needs unique identifier, but since issue doesn't exist use UUID
+                    createIssueNotFoundIssue(createEmptyMinimalIssue(site))
+                );
+            } else {
+                Container.jiraIssueViewManager.createOrShow(createIssueNotFoundIssue(createEmptyMinimalIssue(site)));
+            }
             return;
         }
 
@@ -37,7 +45,12 @@ export async function showIssue(issueOrKeyAndSite: MinimalIssueOrKeyAndSite<Deta
         }
     }
 
-    Container.jiraIssueViewManager.createOrShow(issue);
+    if (Container.isDebugging) {
+        Container.jiraIssueWebviewFactory.createOrShow(issue.key, issue);
+    } else {
+        Container.jiraIssueViewManager.createOrShow(issue);
+    }
+    return;
 }
 export async function showIssueForSiteIdAndKey(siteId: string, issueKey: string) {
     const site: DetailedSiteInfo | undefined = Container.siteManager.getSiteForId(ProductJira, siteId);
@@ -52,7 +65,12 @@ export async function showIssueForSiteIdAndKey(siteId: string, issueKey: string)
         }
     }
 
-    Container.jiraIssueViewManager.createOrShow(issue);
+    if (Container.isDebugging) {
+        Container.jiraIssueWebviewFactory.createOrShow(issue.key, issue);
+    } else {
+        Container.jiraIssueViewManager.createOrShow(issue);
+    }
+    return;
 }
 
 export async function showIssueForKey(issueKey?: string) {
@@ -75,5 +93,9 @@ export async function showIssueForKey(issueKey?: string) {
         }
     }
 
-    Container.jiraIssueViewManager.createOrShow(issue);
+    if (Container.isDebugging) {
+        Container.jiraIssueWebviewFactory.createOrShow(issue.key, issue);
+    } else {
+        Container.jiraIssueViewManager.createOrShow(issue);
+    }
 }

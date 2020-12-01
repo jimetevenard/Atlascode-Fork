@@ -13,6 +13,7 @@ export type CommonMessage =
 
 export interface HostErrorMessage {
     reason: string;
+    additionalData?: any;
 }
 
 export interface OnlineStatusMessage {

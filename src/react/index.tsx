@@ -45,6 +45,9 @@ const routes = {
     createIssueScreenV2: React.lazy(() =>
         import(/* webpackChunkName: "createIssueScreenV2" */ './atlascode/issue/CreateJiraIssuePage')
     ),
+    jiraIssueScreenV2: React.lazy(() =>
+        import(/* webpackChunkName: "jiraIssueScreenV2" */ './atlascode/issue/JiraIssuePage')
+    ),
 };
 
 const view = document.getElementById('reactView') as HTMLElement;

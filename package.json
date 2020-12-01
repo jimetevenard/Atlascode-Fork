@@ -78,6 +78,8 @@
         "mui:createPullRequestPage:light": "cross-env PAGETSX=\"pullrequest/CreatePullRequestPage.tsx\" VIEW=\"createPullRequestPageV2\" THEME=\"light\" webpack-dev-server --open --config webpack.mui.webview.js",
         "mui:createJiraIssue:dark": "cross-env PAGETSX=\"issue/CreateJiraIssuePage.tsx\" VIEW=\"createIssueScreenV2\" THEME=\"dark\" webpack-dev-server --open --config webpack.mui.webview.js",
         "mui:createJiraIssue:light": "cross-env PAGETSX=\"issue/CreateJiraIssuePage.tsx\" VIEW=\"createIssueScreenV2\" THEME=\"light\" webpack-dev-server --open --config webpack.mui.webview.js",
+        "mui:jiraIssue:dark": "cross-env PAGETSX=\"issue/JiraIssuePage.tsx\" VIEW=\"jiraIssueScreenV2\" THEME=\"dark\" webpack-dev-server --open --config webpack.mui.webview.js",
+        "mui:jiraIssue:light": "cross-env PAGETSX=\"issue/JiraIssuePage.tsx\" VIEW=\"jiraIssueScreenV2\" THEME=\"light\" webpack-dev-server --open --config webpack.mui.webview.js",
         "webview:viewJiraIssue:dark": "cross-env PAGETSX=\"issue/JiraIssuePage.tsx\" VIEW=\"viewIssueScreen\" THEME=\"dark\" webpack-dev-server --open --config webpack.react.webview.js",
         "webview:viewJiraIssue:light": "cross-env PAGETSX=\"issue/JiraIssuePage.tsx\" VIEW=\"viewIssueScreen\" THEME=\"light\" webpack-dev-server --open --config webpack.react.webview.js",
         "webview:viewPullRequestScreen:dark": "cross-env PAGETSX=\"pullrequest/PullRequestPage.tsx\" VIEW=\"pullRequestDetailsScreen\" THEME=\"dark\" webpack-dev-server --open --config webpack.react.webview.js",

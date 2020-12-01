@@ -9,4 +9,5 @@ export enum UIWSPort {
     PullRequestDetailsPage,
     CreatePullRequest,
     CreateJiraIssuePage,
+    JiraIssuePage,
 }

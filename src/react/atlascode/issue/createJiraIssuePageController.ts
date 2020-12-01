@@ -13,7 +13,7 @@ import {
     CreateJiraIssueResponse,
     emptyCreateJiraIssueInitMessage,
 } from '../../../lib/ipc/toUI/createJiraIssue';
-import { JiraIssueRenderer } from '../../guipi/jira-issue-renderer-mui/jiraIssueRenderer';
+import { CreateJiraIssueRenderer } from '../../guipi/jira-issue-renderer-mui/createJiraIssueRenderer';
 import { PostMessageFunc, useMessagingApi } from '../messagingApi';
 
 export interface CreateJiraIssueControllerApi {
@@ -134,7 +134,7 @@ export function useCreateJiraIssuePageController(): [CreateJiraIssueState, Creat
         [postMessage]
     );
 
-    const renderer = React.useMemo(() => new JiraIssueRenderer(dispatch), [dispatch]);
+    const renderer = React.useMemo(() => new CreateJiraIssueRenderer(dispatch), [dispatch]);
 
     const createIssueUIHelper = React.useMemo(() => new CreateIssueUIHelper(state.screenData, renderer), [
         renderer,
