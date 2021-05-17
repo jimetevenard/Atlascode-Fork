@@ -347,6 +347,33 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
             />
         );
     }
+
+    public renderTimeTracking(
+        field: InputFieldUI,
+        onChange: (field: FieldUI, value: string) => void,
+        value?: string | undefined
+    ): JSX.Element {
+        return (
+            <div>
+                <TextField
+                    type={this.normalizeType(field.valueType)}
+                    required={field.required}
+                    autoFocus
+                    autoComplete="off"
+                    margin="dense"
+                    id={field.key}
+                    key={field.key}
+                    name={field.key}
+                    label={'Original Estimate'}
+                    fullWidth
+                    helperText={'(e.g. 3w 4d 12h)'}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        onChange(field, e.target.value);
+                    }}
+                />
+            </div>
+        );
+    }
 }
 
 export const IssueLink = (props: any) => {

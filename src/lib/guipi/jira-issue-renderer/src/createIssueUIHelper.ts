@@ -163,6 +163,14 @@ export class CreateIssueUIHelper<S extends JiraSiteInfo, C> {
                     this._delegate.isFieldWaiting(issueFieldUI)
                 );
             }
+            case UIType.Timetracking: {
+                const inputField = fieldUI as InputFieldUI;
+                return this._renderer.renderTimeTracking(
+                    inputField,
+                    this._delegate.fieldDidUpdate,
+                    this._delegate.valueForField(fieldUI)
+                );
+            }
         }
 
         return undefined;

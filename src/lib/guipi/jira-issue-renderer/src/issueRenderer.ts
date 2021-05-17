@@ -49,4 +49,5 @@ export interface IssueRenderer<C> {
         onSelect: (field: FieldUI, value: string) => void,
         isWaiting: boolean
     ) => C;
+    renderTimeTracking: (field: InputFieldUI, onChange: (field: FieldUI, value: string) => void, value?: string) => C;
 }

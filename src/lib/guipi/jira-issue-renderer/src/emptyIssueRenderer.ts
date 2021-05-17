@@ -44,4 +44,5 @@ export const emptyIssueRenderer: IssueRenderer<any> = {
         onAutoComplete: (field: FieldUI, value: string) => void,
         onSelect: (field: FieldUI, value: string) => void
     ) => {},
+    renderTimeTracking: (field: InputFieldUI, onChange: (field: FieldUI, value: string) => void, value?: string) => {},
 };

@@ -337,6 +337,10 @@ export function useCreateJiraIssuePageController(): [CreateJiraIssueState, Creat
         return format(date, 'yyyy-MM-dd');
     }, []);
 
+    const convertTimetrackingData = useCallback((estimate: string): any => {
+        return { originalEstimate: estimate };
+    }, []);
+
     const createIssueData = useCallback((): any => {
         // `issuetype` won't haven been set in `fieldState` if it hasn't changed. Use the value in
         // `screenData.selectedIssueType`.
@@ -357,6 +361,8 @@ export function useCreateJiraIssuePageController(): [CreateJiraIssueState, Creat
                 payload[k] = convertDateTimeData(v.value, false);
             } else if (field.uiType === UIType.DateTime) {
                 payload[k] = convertDateTimeData(v.value, true);
+            } else if (field.uiType === UIType.Timetracking) {
+                payload[k] = convertTimetrackingData(v.value);
             } else {
                 payload[k] = v.value;
             }
