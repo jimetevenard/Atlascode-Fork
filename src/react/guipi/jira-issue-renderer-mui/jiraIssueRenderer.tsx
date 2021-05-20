@@ -374,9 +374,13 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
             </div>
         );
     }
+
+    public renderWorklog(field: FieldUI, onChange: (field: FieldUI, value: any) => void): JSX.Element {
+        return <WorkLog field={field} onChange={onChange} />;
+    }
 }
 
-export const IssueLink = (props: any) => {
+const IssueLink = (props: any) => {
     const emptyLinkType = { id: undefined, name: '', iconUrl: undefined };
     const emptyLinkValue = { id: undefined, key: '', summaryText: '' };
 
@@ -474,6 +478,108 @@ export const IssueLink = (props: any) => {
                     />
                 )}
             />
+        </FormGroup>
+    );
+};
+
+const WorkLog = (props: any) => {
+    const [logWork, setLogWork] = useState(false);
+    const [timeSpent, setTimeSpent] = useState('');
+    const [timeRemaining, setTimeRemaining] = useState('');
+    const [startTime, setStartTime] = useState(new Date());
+    const [comment, setComment] = useState('');
+
+    useEffect(() => {
+        if (logWork && timeSpent && timeRemaining) {
+            props.onChange(props.field, {
+                timeSpent: timeSpent,
+                newEstimate: timeRemaining,
+                comment: comment,
+                started: startTime,
+            });
+        } else {
+            props.onChange(props.field, undefined);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [logWork, timeSpent, timeRemaining, startTime, comment]);
+
+    return (
+        <FormGroup>
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        id={`${props.field.key}-logWork`}
+                        checked={logWork}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+                            setLogWork(checked);
+                        }}
+                    />
+                }
+                label={'Log work'}
+            />
+            {logWork && (
+                <div>
+                    <div>
+                        <TextField
+                            value={timeSpent}
+                            required={logWork}
+                            autoFocus
+                            autoComplete="off"
+                            margin="dense"
+                            id={`${props.field.key}-timeSpent`}
+                            key={`${props.field.key}-timeSpent`}
+                            name={props.field.key}
+                            label={'Worklog time spent'}
+                            helperText={'(e.g. 3w 4d 12h)'}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setTimeSpent(e.target.value);
+                            }}
+                        />
+                        <TextField
+                            value={timeRemaining}
+                            required={logWork}
+                            autoFocus
+                            autoComplete="off"
+                            margin="dense"
+                            id={`${props.field.key}-timeRemaining`}
+                            key={`${props.field.key}-timeRemaining`}
+                            name={props.field.key}
+                            label={'Remaining estimate'}
+                            helperText={'(e.g. 3w 4d 12h)'}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setTimeRemaining(e.target.value);
+                            }}
+                        />
+                    </div>
+                    <KeyboardDateTimePicker
+                        clearable
+                        format="MM/dd/yyyy h:mm a"
+                        minutesStep={5}
+                        id={`${props.field.key}-startTime`}
+                        label={'Worklog start time'}
+                        value={startTime}
+                        onChange={(date: MaterialUiPickersDate, value?: string) => {
+                            setStartTime(date as Date);
+                        }}
+                    />
+                    <TextField
+                        value={comment}
+                        autoFocus
+                        autoComplete="off"
+                        margin="dense"
+                        id={`${props.field.key}-comment`}
+                        key={`${props.field.key}-comment`}
+                        name={props.field.key}
+                        label={'Worklog comment'}
+                        fullWidth
+                        multiline
+                        rows={5}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            setComment(e.target.value);
+                        }}
+                    />
+                </div>
+            )}
         </FormGroup>
     );
 };

@@ -1,6 +1,5 @@
 import { CreatedIssue, Project } from '@atlassianlabs/jira-pi-common-models';
 import { CreateMetaTransformerResult, FieldValues } from '@atlassianlabs/jira-pi-meta-models';
-import { format } from 'date-fns';
 import { DetailedSiteInfo, emptySiteInfo, ProductJira } from '../../atlclients/authInfo';
 import { configuration } from '../../config/configuration';
 import { Container } from '../../container';
@@ -51,9 +50,9 @@ export class VSCCreateJiraIssueActionImpl implements CreateJiraIssueActionApi {
 
     async create(site: DetailedSiteInfo, issueData: FieldValues): Promise<CreatedIssue> {
         const client = await Container.clientManager.jiraClient(site);
-        const [fields, , issuelinks] = this.formatCreatePayload(issueData);
+        const [fields, worklog, issuelinks] = this.formatCreatePayload(issueData);
         Logger.debug(`Creating Jira issue with fields: ${JSON.stringify(fields)}`);
-        const response = await client.createIssue({ fields: fields });
+        const response = await client.createIssue({ fields: fields, update: worklog });
         if (issuelinks) {
             const formattedIssuelinks = this.formatIssuelink(response.key, issuelinks);
             await client.createIssueLink(response.key, formattedIssuelinks);
@@ -81,16 +80,13 @@ export class VSCCreateJiraIssueActionImpl implements CreateJiraIssueActionApi {
             delete payload['attachment'];
         }
 
-        if (payload['worklog'] && payload['worklog'].enabled) {
+        if (payload['worklog']) {
             worklog = {
                 worklog: [
                     {
                         add: {
                             ...payload['worklog'],
                             adjustEstimate: 'new',
-                            started: payload['worklog'].started
-                                ? format(payload['worklog'].started, 'yyyy-MM-ddTHH:mm:ss.SSSXXX')
-                                : undefined,
                         },
                     },
                 ],

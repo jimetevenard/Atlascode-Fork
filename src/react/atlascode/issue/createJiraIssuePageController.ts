@@ -341,6 +341,14 @@ export function useCreateJiraIssuePageController(): [CreateJiraIssueState, Creat
         return { originalEstimate: estimate };
     }, []);
 
+    const convertWorklogData = useCallback((worklog: any): any => {
+        const returnValue = { ...worklog };
+        if (worklog.started) {
+            returnValue.started = format(worklog.started, "yyyy-MM-dd'T'HH:mm:ss.SSSXX");
+        }
+        return returnValue;
+    }, []);
+
     const createIssueData = useCallback((): any => {
         // `issuetype` won't haven been set in `fieldState` if it hasn't changed. Use the value in
         // `screenData.selectedIssueType`.
@@ -363,12 +371,21 @@ export function useCreateJiraIssuePageController(): [CreateJiraIssueState, Creat
                 payload[k] = convertDateTimeData(v.value, true);
             } else if (field.uiType === UIType.Timetracking) {
                 payload[k] = convertTimetrackingData(v.value);
+            } else if (field.uiType === UIType.Worklog) {
+                payload[k] = convertWorklogData(v.value);
             } else {
                 payload[k] = v.value;
             }
         }
         return payload;
-    }, [convertCheckboxData, convertDateTimeData, state.fieldState, selectedIssueData]);
+    }, [
+        convertCheckboxData,
+        convertDateTimeData,
+        state.fieldState,
+        selectedIssueData,
+        convertTimetrackingData,
+        convertWorklogData,
+    ]);
 
     const createIssue = useCallback((): Promise<IssueKeyAndSite<DetailedSiteInfo>> => {
         return new Promise<IssueKeyAndSite<DetailedSiteInfo>>((resolve, reject) => {

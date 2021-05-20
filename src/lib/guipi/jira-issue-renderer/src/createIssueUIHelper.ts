@@ -171,6 +171,9 @@ export class CreateIssueUIHelper<S extends JiraSiteInfo, C> {
                     this._delegate.valueForField(fieldUI)
                 );
             }
+            case UIType.Worklog: {
+                return this._renderer.renderWorklog(fieldUI, this._delegate.fieldDidUpdate);
+            }
         }
 
         return undefined;

@@ -45,4 +45,5 @@ export const emptyIssueRenderer: IssueRenderer<any> = {
         onSelect: (field: FieldUI, value: string) => void
     ) => {},
     renderTimeTracking: (field: InputFieldUI, onChange: (field: FieldUI, value: string) => void, value?: string) => {},
+    renderWorklog: (field: FieldUI, onChange: (field: FieldUI, value: any) => void) => {},
 };
