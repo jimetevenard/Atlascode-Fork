@@ -21,6 +21,7 @@ import { KeyboardDatePicker, KeyboardDateTimePicker } from '@material-ui/pickers
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import React, { useEffect, useState } from 'react';
 import { CheckboxValue, IssueRenderer } from '../../../lib/guipi/jira-issue-renderer/src/issueRenderer';
+import { AttachmentForm } from './AttachmentForm';
 
 export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
     constructor() {}
@@ -348,31 +349,19 @@ export class JiraIssueRenderer implements IssueRenderer<JSX.Element> {
         );
     }
 
-    public renderAttachment(field: FieldUI): JSX.Element {
+    public renderAttachment(field: FieldUI, onChange: (field: FieldUI, value: any[]) => void): JSX.Element {
         return (
             <AttachmentForm
                 onChange={(files: File[]) => {
                     if (Array.isArray(files)) {
-                        if (files.length > 0) {
-                            this._dispatch({
-                                type: CreateJiraIssueUIActionType.FieldUpdate,
-                                fieldUI: field,
-                                value: undefined,
-                            });
-                        }
-
-                        const serFiles = files.map((file: any) => ({
+                        const fileMeta = files.map((file: any) => ({
                             name: file.name,
                             size: file.size,
                             type: file.type,
                             path: file.path,
                         }));
 
-                        this._dispatch({
-                            type: CreateJiraIssueUIActionType.FieldUpdate,
-                            fieldUI: field,
-                            value: serFiles,
-                        });
+                        onChange(field, fileMeta);
                     }
                 }}
             />

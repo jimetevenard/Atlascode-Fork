@@ -49,5 +49,5 @@ export interface IssueRenderer<C> {
         onSelect: (field: FieldUI, value: string) => void,
         isWaiting: boolean
     ) => C;
-    renderAttachment: (field: FieldUI, value?: string) => C;
+    renderAttachment: (field: FieldUI, onChange: (field: FieldUI, value: any[]) => void, value?: string) => C;
 }

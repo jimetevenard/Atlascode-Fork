@@ -44,5 +44,5 @@ export const emptyIssueRenderer: IssueRenderer<any> = {
         onAutoComplete: (field: FieldUI, value: string) => void,
         onSelect: (field: FieldUI, value: string) => void
     ) => {},
-    renderAttachment: (field: FieldUI) => {},
+    renderAttachment: (field: FieldUI, onChange: (field: FieldUI, value: any[]) => void) => {},
 };

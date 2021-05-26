@@ -1,6 +1,8 @@
 import { CreatedIssue, Project } from '@atlassianlabs/jira-pi-common-models';
 import { CreateMetaTransformerResult, FieldValues } from '@atlassianlabs/jira-pi-meta-models';
 import { format } from 'date-fns';
+import FormData from 'form-data';
+import * as fs from 'fs';
 import { DetailedSiteInfo, emptySiteInfo, ProductJira } from '../../atlclients/authInfo';
 import { configuration } from '../../config/configuration';
 import { Container } from '../../container';
@@ -51,13 +53,24 @@ export class VSCCreateJiraIssueActionImpl implements CreateJiraIssueActionApi {
 
     async create(site: DetailedSiteInfo, issueData: FieldValues): Promise<CreatedIssue> {
         const client = await Container.clientManager.jiraClient(site);
-        const [fields, , issuelinks] = this.formatCreatePayload(issueData);
+        const [fields, , issuelinks, attachments] = this.formatCreatePayload(issueData);
         Logger.debug(`Creating Jira issue with fields: ${JSON.stringify(fields)}`);
         const response = await client.createIssue({ fields: fields });
         if (issuelinks) {
             const formattedIssuelinks = this.formatIssuelink(response.key, issuelinks);
             await client.createIssueLink(response.key, formattedIssuelinks);
         }
+        if (attachments) {
+            let formData = new FormData();
+            attachments.forEach((file: any) => {
+                formData.append('file', fs.createReadStream(file.path), {
+                    filename: file.name,
+                    contentType: file.type,
+                });
+            });
+            await client.addAttachments(response.key, formData);
+        }
+
         return response;
     }
 

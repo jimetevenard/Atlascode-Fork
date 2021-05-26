@@ -164,7 +164,7 @@ export class CreateIssueUIHelper<S extends JiraSiteInfo, C> {
                 );
             }
             case UIType.Attachment:
-                return this._renderer.renderAttachment(fieldUI);
+                return this._renderer.renderAttachment(fieldUI, this._delegate.fieldDidUpdate);
         }
 
         return undefined;
