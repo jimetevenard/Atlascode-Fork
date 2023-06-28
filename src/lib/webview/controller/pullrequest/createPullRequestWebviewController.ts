@@ -1,23 +1,24 @@
-import { defaultActionGuard } from '@atlassianlabs/guipi-core-controller';
-import Axios from 'axios';
-import { Registry } from '../../../../analytics';
-import { ProductBitbucket } from '../../../../atlclients/authInfo';
-import { WorkspaceRepo } from '../../../../bitbucket/model';
-import { AnalyticsApi } from '../../../analyticsApi';
-import { CommonActionType } from '../../../ipc/fromUI/common';
-import { CreatePullRequestAction, CreatePullRequestActionType } from '../../../ipc/fromUI/createPullRequest';
-import { WebViewID } from '../../../ipc/models/common';
 import { CommonMessage, CommonMessageType } from '../../../ipc/toUI/common';
+import { CreatePullRequestAction, CreatePullRequestActionType } from '../../../ipc/fromUI/createPullRequest';
 import {
     CreatePullRequestMessage,
     CreatePullRequestMessageType,
     CreatePullRequestResponse,
 } from '../../../ipc/toUI/createPullRequest';
-import { Logger } from '../../../logger';
-import { formatError } from '../../formatError';
-import { CommonActionMessageHandler } from '../common/commonActionMessageHandler';
 import { MessagePoster, WebviewController } from '../webviewController';
+
+import { AnalyticsApi } from '../../../analyticsApi';
+import Axios from 'axios';
+import { CommonActionMessageHandler } from '../common/commonActionMessageHandler';
+import { CommonActionType } from '../../../ipc/fromUI/common';
 import { CreatePullRequestActionApi } from './createPullRequestActionApi';
+import { Logger } from '../../../logger';
+import { ProductBitbucket } from '../../../../atlclients/authInfo';
+import { Registry } from '../../../../analytics';
+import { WebViewID } from '../../../ipc/models/common';
+import { WorkspaceRepo } from '../../../../bitbucket/model';
+import { defaultActionGuard } from '@atlassianlabs/guipi-core-controller';
+import { formatError } from '../../formatError';
 
 export class CreatePullRequestWebviewController implements WebviewController<WorkspaceRepo> {
     private isRefreshing = false;
@@ -159,7 +160,7 @@ export class CreatePullRequestWebviewController implements WebviewController<Wor
                         type: CreatePullRequestMessageType.SubmitResponse,
                         pr: pr,
                     });
-                    this.analytics.firePrCreatedEvent(msg.sourceSiteRemote.site!.details);
+                    this.analytics.firePrCreatedEvent(msg.sourceSiteRemote.site?.details);
                 } catch (e) {
                     this.logger.error(new Error(`error creating pull request: ${e}`));
                     this.postMessage({

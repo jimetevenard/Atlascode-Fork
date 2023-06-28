@@ -1,12 +1,3 @@
-import { CancelToken } from 'axios';
-import { DetailedSiteInfo } from '../../atlclients/authInfo';
-import { configuration } from '../../config/configuration';
-import { Container } from '../../container';
-import { CacheMap } from '../../util/cachemap';
-import { Time } from '../../util/time';
-import { getFileNameFromPaths } from '../../views/pullrequest/diffViewHelper';
-import { clientForSite } from '../bbUtils';
-import { HTTPClient } from '../httpClient';
 import {
     ApprovalStatus,
     BitbucketSite,
@@ -26,7 +17,17 @@ import {
     User,
     WorkspaceRepo,
 } from '../model';
+
+import { CacheMap } from '../../util/cachemap';
+import { CancelToken } from 'axios';
+import { Container } from '../../container';
+import { DetailedSiteInfo } from '../../atlclients/authInfo';
+import { HTTPClient } from '../httpClient';
 import { ServerRepositoriesApi } from './repositories';
+import { Time } from '../../util/time';
+import { clientForSite } from '../bbUtils';
+import { configuration } from '../../config/configuration';
+import { getFileNameFromPaths } from '../../views/pullrequest/diffViewHelper';
 
 export class ServerPullRequestApi implements PullRequestApi {
     private defaultReviewersCache: CacheMap = new CacheMap();
@@ -70,7 +71,7 @@ export class ServerPullRequestApi implements PullRequestApi {
     //The reason for needing to fetch the current user and take the userName property is documented in the User model.
     private async userName(workspaceRepo: WorkspaceRepo) {
         const { userName } = await Container.bitbucketContext.currentUser(workspaceRepo.mainSiteRemote.site!);
-        return userName ?? workspaceRepo.mainSiteRemote.site!.details.userId; //userName should always be defined, but this is a little added safety
+        return userName ?? workspaceRepo.mainSiteRemote.site?.details?.userId; //userName should always be defined, but this is a little added safety
     }
 
     async getListCreatedByMe(workspaceRepo: WorkspaceRepo): Promise<PaginatedPullRequests> {
