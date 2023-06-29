@@ -32,6 +32,8 @@ jobs:
            vsce package
            --baseContentUrl $BASE_URL
            --baseImagesUrl $BASE_URL
+           --no-git-tag-version
+           --no-update-package-json
            $VERSION
     - name: Publish Github Release
       uses: softprops/action-gh-release@v1
