@@ -1,0 +1,42 @@
+# Build extension as vscode .vsix package
+# and publish it on GitHub
+# ========================================
+
+name: Build and publish
+
+on: push
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Version
+      id: version
+      # Use current date+time as version
+      run: |
+           export VERSION=$(TZ='Europe/Paris' date +%Y-%m-%d-%H-%M)
+           echo "::set-output name=VERSION::$VERSION"    
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - name: Install
+      run: |
+           npm install
+           npm install -g @vscode/vsce
+    - name: Build
+      env:
+        VERSION: 0.1.0-fix-${{ steps.version.outputs.VERSION }}
+        BASE_URL: https://bitbucket.org/atlassianlabs/atlascode/raw/master/
+      run: >
+           vsce package
+           --baseContentUrl $BASE_URL
+           --baseImagesUrl $BASE_URL
+           --no-git-tag-version
+           --no-update-package-json
+           $VERSION
+    - name: Publish Github Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        files: '*.vsix'
