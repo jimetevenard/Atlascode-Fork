@@ -180,24 +180,7 @@ export class ServerPullRequestApi implements PullRequestApi {
     }
 
     async getTasks(pr: PullRequest): Promise<Task[]> {
-        const { ownerSlug, repoSlug } = pr.site;
-
-        let { data } = await this.client.get(
-            `/rest/api/1.0/projects/${ownerSlug}/repos/${repoSlug}/pull-requests/${pr.data.id}/tasks`
-        );
-
-        if (!data.values) {
-            return [];
-        }
-
-        const accumulatedTasks = data.values as any[];
-        while (data.next) {
-            const nextPage = await this.client.get(data.next);
-            data = nextPage.data;
-            accumulatedTasks.push(...(data.values || []));
-        }
-
-        return accumulatedTasks.map((task: any) => this.convertDataToTask(task, pr.site));
+        return new Promise((resolve) => resolve([])); // FixMe : Replace depracated API endpoint call !
     }
 
     async postTask(site: BitbucketSite, prId: string, content: string, commentId?: string): Promise<Task> {
