@@ -27,7 +27,7 @@ const AnalyticDelay = 5000;
 
 export async function activate(context: ExtensionContext) {
     const start = process.hrtime();
-    const atlascode = extensions.getExtension('atlassian.atlascode')!;
+    const atlascode = extensions.getExtension('atlassian.atlascode-fork')!;
     const atlascodeVersion = atlascode.packageJSON.version;
     const previousVersion = context.globalState.get<string>(GlobalStateVersionKey);
 
